@@ -6,4 +6,6 @@
   :dependencies [[org.clojure/clojure "1.8.0"]]
   :main ^:skip-aot symbolic-logic-solver.core
   :target-path "target/%s"
+  :plugins [[refactor-nrepl "1.1.0"]
+            [cider/cider-nrepl "0.9.1"]]
   :profiles {:uberjar {:aot :all}})
