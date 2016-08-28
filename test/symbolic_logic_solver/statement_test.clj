@@ -23,4 +23,14 @@
     (is (= "pqr&=" (#'statement/infix-to-postfix "p=(q&r)")))
     (is (= "pq&~" (#'statement/infix-to-postfix "~(p&q)")))))
 
+(deftest postfix-to-statement-test
+  (testing "does it work"
+    (is (= (list :var \p) (#'statement/postfix-to-statement "p")))
+    (is (= (list :and (list :var \p) (list :var \q)) (#'statement/postfix-to-statement "pq&")))
+    (is (= (list :or (list :var \p) (list :var \q)) (#'statement/postfix-to-statement "pqv")))
+    (is (= (list :equ (list :var \p) (list :var \q)) (#'statement/postfix-to-statement "pq=")))
+    (is (= (list :ent (list :var \p) (list :var \q)) (#'statement/postfix-to-statement "pq>")))
+    (is (= (list :not (list :and (list :var \p) (list :var \q))) (#'statement/postfix-to-statement "pq&~")))
+    (is (= (list :equ (list :or (list :var \p) (list :var \q)) (list :and (list :var \r) (list :var \s))) (#'statement/postfix-to-statement "pqvrs&=")))))
+
 (deftest string-to-statement-test)

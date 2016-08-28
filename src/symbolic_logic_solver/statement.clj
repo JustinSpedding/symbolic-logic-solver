@@ -14,8 +14,8 @@
         (recur (pop stack))
         stack))))
 
-(defn- infix-to-postfix [input-string]
-  (loop [remaining input-string
+(defn- infix-to-postfix [infix]
+  (loop [remaining infix
          stack (list)
          output ""]
     (if-let [current-char (first remaining)]
@@ -36,7 +36,17 @@
                                                            (str output current-char)))
       (apply str output stack))))
 
-(defn- postfix-to-statement [postfix])
+(defn- postfix-to-statement [postfix]
+  (loop [remaining postfix
+         stack (list)]
+    (if-let [current-char (first remaining)]
+      (cond (symbols/binary-operator? current-char) (recur (rest remaining)
+                                                           (conj (drop 2 stack) (list (symbols/char-to-keyword current-char) (second stack) (first stack))))
+            (= symbols/not-operator current-char)   (recur (rest remaining)
+                                                           (conj (drop 1 stack) (list :not (first stack))))
+            :else                                   (recur (rest remaining)
+                                                           (conj stack (list :var current-char))))
+      (first stack))))
 
 (defn string-to-statement [input-string]
   (-> input-string
