@@ -1,5 +1,6 @@
-(ns symbolic-logic-solver.statement
-  (:require [symbolic-logic-solver.symbols :as symbols]))
+(ns symbolic-logic-solver.statement-converter
+  (:require [symbolic-logic-solver.symbols :as symbols]
+            [symbolic-logic-solver.statements :refer :all]))
 
 (defn atom? [statement])
 
@@ -41,11 +42,11 @@
          stack (list)]
     (if-let [current-char (first remaining)]
       (cond (symbols/binary-operator? current-char) (recur (rest remaining)
-                                                           (conj (drop 2 stack) (list (symbols/char-to-keyword current-char) (second stack) (first stack))))
+                                                           (conj (drop 2 stack) ((symbols/char-to-record-constructor current-char) (second stack) (first stack))))
             (= symbols/not-operator current-char)   (recur (rest remaining)
-                                                           (conj (drop 1 stack) (list :not (first stack))))
+                                                           (conj (drop 1 stack) (->Not (first stack))))
             :else                                   (recur (rest remaining)
-                                                           (conj stack (list :var current-char))))
+                                                           (conj stack (->Var current-char))))
       (first stack))))
 
 (defn string-to-statement [input-string]

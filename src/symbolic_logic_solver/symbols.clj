@@ -1,4 +1,5 @@
-(ns symbolic-logic-solver.symbols)
+(ns symbolic-logic-solver.symbols
+  (:require [symbolic-logic-solver.statements :refer :all]))
 
 (def open-paren \()
 
@@ -19,8 +20,8 @@
                                equivalent-operator
                                entails-operator} op))
 
-(defn char-to-keyword [op] ({and-operator :and
-                             or-operator :or
-                             equivalent-operator :equ
-                             entails-operator :ent
-                             not-operator :not} op))
+(defn char-to-record-constructor [op] ({and-operator ->And
+                                        or-operator ->Or
+                                        equivalent-operator ->Equ
+                                        entails-operator ->Ent
+                                        not-operator ->Not} op))

@@ -1,6 +1,7 @@
-(ns symbolic-logic-solver.statement-test
+(ns symbolic-logic-solver.statement-converter-test
   (:require [clojure.test :refer :all]
-            [symbolic-logic-solver.statement :as statement]))
+            [symbolic-logic-solver.statement-converter :as statement]
+            [symbolic-logic-solver.statements :refer :all]))
 
 (deftest atom?-test)
 
@@ -25,12 +26,12 @@
 
 (deftest postfix-to-statement-test
   (testing "does it work"
-    (is (= (list :var \p) (#'statement/postfix-to-statement "p")))
-    (is (= (list :and (list :var \p) (list :var \q)) (#'statement/postfix-to-statement "pq&")))
-    (is (= (list :or (list :var \p) (list :var \q)) (#'statement/postfix-to-statement "pqv")))
-    (is (= (list :equ (list :var \p) (list :var \q)) (#'statement/postfix-to-statement "pq=")))
-    (is (= (list :ent (list :var \p) (list :var \q)) (#'statement/postfix-to-statement "pq>")))
-    (is (= (list :not (list :and (list :var \p) (list :var \q))) (#'statement/postfix-to-statement "pq&~")))
-    (is (= (list :equ (list :or (list :var \p) (list :var \q)) (list :and (list :var \r) (list :var \s))) (#'statement/postfix-to-statement "pqvrs&=")))))
+    (is (= (->Var \p) (#'statement/postfix-to-statement "p")))
+    (is (= (->And (->Var \p) (->Var \q)) (#'statement/postfix-to-statement "pq&")))
+    (is (= (->Or (->Var \p) (->Var \q)) (#'statement/postfix-to-statement "pqv")))
+    (is (= (->Equ (->Var \p) (->Var \q)) (#'statement/postfix-to-statement "pq=")))
+    (is (= (->Ent (->Var \p) (->Var \q)) (#'statement/postfix-to-statement "pq>")))
+    (is (= (->Not (->And (->Var \p) (->Var \q))) (#'statement/postfix-to-statement "pq&~")))
+    (is (= (->Equ (->Or (->Var \p) (->Var \q)) (->And (->Var \r) (->Var \s))) (#'statement/postfix-to-statement "pqvrs&=")))))
 
 (deftest string-to-statement-test)
