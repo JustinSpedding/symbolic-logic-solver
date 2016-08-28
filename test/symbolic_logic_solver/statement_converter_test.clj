@@ -3,8 +3,6 @@
             [symbolic-logic-solver.statement-converter :as statement]
             [symbolic-logic-solver.statements :refer :all]))
 
-(deftest atom?-test)
-
 (deftest remove-whitespace-test
   (testing "removes all spaces and keeps non-whitespace chars"
     (is (= (seq "helloworld") (#'statement/remove-whitespace "   hello   world   ")))))

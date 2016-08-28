@@ -2,8 +2,6 @@
   (:require [symbolic-logic-solver.symbols :as symbols]
             [symbolic-logic-solver.statements :refer :all]))
 
-(defn atom? [statement])
-
 (defn- remove-whitespace [input-string]
   (remove #{\ } input-string))
 
