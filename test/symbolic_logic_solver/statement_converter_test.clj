@@ -34,4 +34,6 @@
     (is (= (->Not (->And (->Var \p) (->Var \q))) (#'statement/postfix-to-statement "pq&~")))
     (is (= (->Equ (->Or (->Var \p) (->Var \q)) (->And (->Var \r) (->Var \s))) (#'statement/postfix-to-statement "pqvrs&=")))))
 
-(deftest string-to-statement-test)
+(deftest string-to-statement-test
+  (testing "does it work"
+    (is (= (->Equ (->Or (->Var \p) (->Var \q)) (->And (->Var \r) (->Var \s))) (#'statement/string-to-statement "((pvq)=(r&s))")))))
