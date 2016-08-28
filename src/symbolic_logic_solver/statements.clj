@@ -16,3 +16,5 @@
   (or (= Var (type statement))
       (and (= Not (type statement))
            (= Var (type (:arg1 statement))))))
+
+(defn consistent? [& statements])
