@@ -7,11 +7,10 @@
 
 (defn- pop-while-removed-item-makes-predicate-true [stack pred]
   (loop [stack stack]
-    (if (empty? stack)
-      stack
-      (if (pred (peek stack))
-        (recur (pop stack))
-        stack))))
+    (if (and (seq stack)
+             (pred (peek stack)))
+      (recur (pop stack))
+      stack)))
 
 (defn- infix-to-postfix [infix]
   (loop [remaining infix

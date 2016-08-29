@@ -7,6 +7,15 @@
   (testing "removes all spaces and keeps non-whitespace chars"
     (is (= (seq "helloworld") (#'statement/remove-whitespace "   hello   world   ")))))
 
+(deftest pop-while-removed-item-makes-predicate-true-test
+  (testing "pops all items until the predicate is not true"
+    (is (= (list 1 2 3) (#'statement/pop-while-removed-item-makes-predicate-true (list 1 2 3) zero?)))
+    (is (= (list 1 2 3) (#'statement/pop-while-removed-item-makes-predicate-true (list 1 2 3) #(== 2 %))))
+    (is (= (list 2 3) (#'statement/pop-while-removed-item-makes-predicate-true (list 1 2 3) #(== 1 %))))
+    (is (= (list 3) (#'statement/pop-while-removed-item-makes-predicate-true (list 1 2 3) #(< % 3)))))
+  (testing "does not break with empty stack"
+    (is (= (list) (#'statement/pop-while-removed-item-makes-predicate-true (list) identity)))))
+
 (deftest infix-to-postfix-test
   (testing "does it work"
     (is (= "ppv" (#'statement/infix-to-postfix "pvp")))
