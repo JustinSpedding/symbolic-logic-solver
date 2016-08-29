@@ -25,13 +25,28 @@
 (deftest postfix-to-statement-test
   (testing "does it work"
     (is (= (->Var \p) (#'statement/postfix-to-statement "p")))
-    (is (= (->And (->Var \p) (->Var \q)) (#'statement/postfix-to-statement "pq&")))
-    (is (= (->Or (->Var \p) (->Var \q)) (#'statement/postfix-to-statement "pqv")))
-    (is (= (->Equ (->Var \p) (->Var \q)) (#'statement/postfix-to-statement "pq=")))
-    (is (= (->Ent (->Var \p) (->Var \q)) (#'statement/postfix-to-statement "pq>")))
-    (is (= (->Not (->And (->Var \p) (->Var \q))) (#'statement/postfix-to-statement "pq&~")))
-    (is (= (->Equ (->Or (->Var \p) (->Var \q)) (->And (->Var \r) (->Var \s))) (#'statement/postfix-to-statement "pqvrs&=")))))
+
+    (is (= (->And (->Var \p)
+                  (->Var \q)) (#'statement/postfix-to-statement "pq&")))
+
+    (is (= (->Or (->Var \p)
+                 (->Var \q)) (#'statement/postfix-to-statement "pqv")))
+
+    (is (= (->Equ (->Var \p)
+                  (->Var \q)) (#'statement/postfix-to-statement "pq=")))
+
+    (is (= (->Ent (->Var \p)
+                  (->Var \q)) (#'statement/postfix-to-statement "pq>")))
+
+    (is (= (->Not (->And (->Var \p)
+                         (->Var \q))) (#'statement/postfix-to-statement "pq&~")))
+
+    (is (= (->Equ (->Or (->Var \p)
+                        (->Var \q)) (->And (->Var \r) (->Var \s))) (#'statement/postfix-to-statement "pqvrs&=")))))
 
 (deftest string-to-statement-test
   (testing "does it work"
-    (is (= (->Equ (->Or (->Var \p) (->Var \q)) (->And (->Var \r) (->Var \s))) (#'statement/string-to-statement "((pvq)=(r&s))")))))
+    (is (= (->Equ (->Or (->Var \p)
+                        (->Var \q))
+                  (->And (->Var \r)
+                         (->Var \s))) (#'statement/string-to-statement "((pvq)=(r&s))")))))

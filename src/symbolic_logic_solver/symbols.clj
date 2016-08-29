@@ -2,17 +2,11 @@
   (:require [symbolic-logic-solver.statements :refer :all]))
 
 (def open-paren \()
-
 (def close-paren \))
-
 (def and-operator \&)
-
 (def or-operator \v)
-
 (def equivalent-operator \=)
-
 (def entails-operator \>)
-
 (def not-operator \~)
 
 (defn binary-operator? [op] (#{and-operator
