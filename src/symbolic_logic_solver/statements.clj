@@ -16,9 +16,9 @@
 (defn Not? [statement] (= Not (type statement)))
 
 (defn atom? [statement]
-  (or (= Var (type statement))
-      (and (= Not (type statement))
-           (= Var (type (:arg1 statement))))))
+  (or (Var? statement)
+      (and (Not? statement)
+           (Var? (:arg1 statement)))))
 
 (defn- consistent?-worker [statements true-vars false-vars]
   (loop [statements statements
