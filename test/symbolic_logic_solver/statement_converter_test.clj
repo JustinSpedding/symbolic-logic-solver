@@ -60,4 +60,4 @@
     (is (= (->Equ (->Or (->Var \p)
                         (->Var \q))
                   (->And (->Var \r)
-                         (->Var \s))) (#'statement/string-to-statement "((pvq)=(r&s))")))))
+                         (->Var \s))) (statement/string-to-statement "((pvq)=(r&s))")))))
