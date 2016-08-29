@@ -7,5 +7,5 @@
   :main ^:skip-aot symbolic-logic-solver.core
   :target-path "target/%s"
   :plugins [[refactor-nrepl "1.1.0"]
-            [cider/cider-nrepl "0.9.1"]]
+            [cider/cider-nrepl "0.13.0"]]
   :profiles {:uberjar {:aot :all}})
