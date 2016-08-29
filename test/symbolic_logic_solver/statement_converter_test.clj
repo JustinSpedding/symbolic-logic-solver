@@ -42,7 +42,9 @@
                          (->Var \q))) (#'statement/postfix-to-statement "pq&~")))
 
     (is (= (->Equ (->Or (->Var \p)
-                        (->Var \q)) (->And (->Var \r) (->Var \s))) (#'statement/postfix-to-statement "pqvrs&=")))))
+                        (->Var \q))
+                  (->And (->Var \r)
+                         (->Var \s))) (#'statement/postfix-to-statement "pqvrs&=")))))
 
 (deftest string-to-statement-test
   (testing "does it work"
