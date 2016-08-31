@@ -155,3 +155,18 @@
       (is (not (generator/eliminate-ent (list ent-statement)
                                         (->Reiteration ent-statement)
                                         (->Var \q)))))))
+
+(deftest eliminate-not-test
+  (testing "eliminates Not if it is a double negation of the conclusion"
+    (let [not-statement (->Not (->Not (->Var \p)))]
+      (is (= (->NotElimination (->Reiteration not-statement)
+                               (->Var \p))
+             (generator/eliminate-not (list not-statement)
+                                      (->Reiteration not-statement)
+                                      (->Var \p))))))
+
+  (testing "does not eliminate Not if it is not a double negation of the conclusion"
+    (let [not-statement (->Not (->Not (->Var \p)))]
+      (is (not (generator/eliminate-not (list not-statement)
+                                        (->Reiteration not-statement)
+                                        (->Var \q)))))))

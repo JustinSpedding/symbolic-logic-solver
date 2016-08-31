@@ -54,7 +54,13 @@
                         (generate-proof assumptions arg1)
                         conclusion))))
 
-(defn eliminate-not [assumptions last-step conclusion])
+(defn eliminate-not [assumptions last-step conclusion]
+  (let [assumption-to-eliminate (:conclusion last-step)
+        arg1 (:arg1 assumption-to-eliminate)]
+    (if (and (Not? arg1)
+             (= (:arg1 arg1) conclusion))
+      (->NotElimination last-step
+                        conclusion))))
 
 (defn introduce-and [assumptions conclusion])
 (defn introduce-or  [assumptions conclusion])
