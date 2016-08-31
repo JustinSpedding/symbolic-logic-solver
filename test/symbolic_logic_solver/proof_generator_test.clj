@@ -75,3 +75,14 @@
                (generator/eliminate-or (list or-statement)
                                        (->Reiteration or-statement)
                                        (->Var \p)))))))
+
+(deftest eliminate-equ-test
+  (testing "eliminates Equ if one arg is the conclusion and the other is entailed by the assumptions"
+    (let [equ-statement (->Equ (->Var \p) (->Var \q))]
+      (is (= (->EquElimination (->Reiteration equ-statement)
+                               (->Reiteration (->Var \p))
+                               (->Var \q))
+             (generator/eliminate-equ (list equ-statement
+                                            (->Var \p))
+                                      (->Reiteration equ-statement)
+                                      (->Var \q)))))))

@@ -33,7 +33,17 @@
                        (->Assumption arg2 (generate-proof (list arg2) conclusion))
                        conclusion))))
 
-(defn eliminate-equ [assumptions last-step conclusion])
+(defn eliminate-equ [assumptions last-step conclusion]
+  (let [assumption-to-eliminate (:conclusion last-step)
+        arg1 (:arg1 assumption-to-eliminate)
+        arg2 (:arg2 assumption-to-eliminate)]
+    (some #(if (and (= (first %) conclusion)
+                    (entails? assumptions (second %)))
+             (->EquElimination last-step
+                               (generate-proof (remove (fn [x] (= assumption-to-eliminate x)) assumptions) (second %))
+                               conclusion))
+          [[arg1 arg2] [arg2 arg1]])))
+
 (defn eliminate-ent [assumptions last-step conclusion])
 (defn eliminate-not [assumptions last-step conclusion])
 
