@@ -57,13 +57,13 @@
              (generator/eliminate-and (list and-statement
                                             (->And and-statement (->Var \r)))
                                       (->Reiteration and-statement)
-                                      (->Var \p)))))))
+                                      (->Var \p))))))
 
   (testing "does not eliminate And if neither arg is the conclusion"
-      (let [and-statement (->And (->Var \p) (->Var \q))]
-        (is (not (generator/eliminate-and (list and-statement (->Var \r))
-                                          (->Reiteration and-statement)
-                                          (->Var \r))))))
+    (let [and-statement (->And (->Var \p) (->Var \q))]
+      (is (not (generator/eliminate-and (list and-statement (->Var \r))
+                                        (->Reiteration and-statement)
+                                        (->Var \r)))))))
 
   (deftest eliminate-or-test
     (testing "eliminates Or if both args entail the conclusion"
@@ -129,4 +129,29 @@
 
       (is (not (generator/eliminate-equ (list equ-statement)
                                         (->Reiteration equ-statement)
+                                        (->Var \q)))))))
+
+(deftest eliminate-ent-test
+  (testing "eliminates Ent if arg2 is the conclusion and arg1 is entailed by the assumptions"
+    (let [ent-statement (->Ent (->Var \p) (->Var \q))]
+      (is (= (->EntElimination (->Reiteration ent-statement)
+                               (->Reiteration (->Var \p))
+                               (->Var \q))
+             (generator/eliminate-ent (list ent-statement
+                                            (->Var \p))
+                                      (->Reiteration ent-statement)
+                                      (->Var \q))))))
+
+  (testing "does not eliminate Ent if arg2 is not the conclusion"
+    (let [ent-statement (->Ent (->Var \p) (->Var \q))]
+      (is (not (generator/eliminate-ent (list ent-statement
+                                              (->Var \p)
+                                              (->Var \r))
+                                        (->Reiteration ent-statement)
+                                        (->Var \r))))))
+
+  (testing "does not eliminate Ent if arg1 is not entailed by the assumptions"
+    (let [ent-statement (->Ent (->Var \p) (->Var \q))]
+      (is (not (generator/eliminate-ent (list ent-statement)
+                                        (->Reiteration ent-statement)
                                         (->Var \q)))))))

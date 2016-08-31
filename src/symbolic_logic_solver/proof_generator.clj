@@ -44,7 +44,16 @@
                                conclusion))
           [[arg1 arg2] [arg2 arg1]])))
 
-(defn eliminate-ent [assumptions last-step conclusion])
+(defn eliminate-ent [assumptions last-step conclusion]
+  (let [assumption-to-eliminate (:conclusion last-step)
+        arg1 (:arg1 assumption-to-eliminate)
+        arg2 (:arg2 assumption-to-eliminate)]
+    (if (and (= arg2 conclusion)
+             (entails? assumptions arg1))
+      (->EntElimination last-step
+                        (generate-proof assumptions arg1)
+                        conclusion))))
+
 (defn eliminate-not [assumptions last-step conclusion])
 
 (defn introduce-and [assumptions conclusion])
