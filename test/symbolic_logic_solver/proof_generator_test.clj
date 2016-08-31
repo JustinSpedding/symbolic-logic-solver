@@ -74,16 +74,31 @@
                                 (->Var \p))
                (generator/eliminate-or (list or-statement)
                                        (->Reiteration or-statement)
-                                       (->Var \p))))))
+                                       (->Var \p)))))
+
+      (let [and-statement (->And (->Var \p) (->Var \q))
+            or-statement (->Or and-statement
+                               and-statement)
+            and-step (->AndElimination (->Reiteration and-statement) (->Var \p))]
+        (with-redefs [generator/generate-proof (fn [a b] and-step)]
+          (is (= (->OrElimination (->Reiteration or-statement)
+                                  (->Assumption and-statement and-step)
+                                  (->Assumption and-statement and-step)
+                                  (->Var \p))
+                 (generator/eliminate-or (list or-statement)
+                                         (->Reiteration or-statement)
+                                         (->Var \p)))))))
 
     (testing "does not eliminate Or if at least one arg does not entail the conclusion"
       (let [or-statement (->Or (->Var \p) (->Var \q))]
         (is (not (generator/eliminate-or (list or-statement)
                                          (->Reiteration or-statement)
                                          (->Var \p))))
+
         (is (not (generator/eliminate-or (list or-statement)
                                          (->Reiteration or-statement)
                                          (->Var \q))))
+
         (is (not (generator/eliminate-or (list or-statement)
                                          (->Reiteration or-statement)
                                          (->Var \r)))))))
@@ -111,6 +126,7 @@
       (is (not (generator/eliminate-equ (list equ-statement)
                                         (->Reiteration equ-statement)
                                         (->Var \p))))
+
       (is (not (generator/eliminate-equ (list equ-statement)
                                         (->Reiteration equ-statement)
                                         (->Var \q)))))))
