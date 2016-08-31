@@ -74,7 +74,18 @@
                                 (->Var \p))
                (generator/eliminate-or (list or-statement)
                                        (->Reiteration or-statement)
-                                       (->Var \p)))))))
+                                       (->Var \p))))))
+    (testing "does not eliminate Or if at least one arg does not entail the conclusion"
+      (let [or-statement (->Or (->Var \p) (->Var \q))]
+        (is (not (generator/eliminate-or (list or-statement)
+                                         (->Reiteration or-statement)
+                                         (->Var \p))))
+        (is (not (generator/eliminate-or (list or-statement)
+                                         (->Reiteration or-statement)
+                                         (->Var \q))))
+        (is (not (generator/eliminate-or (list or-statement)
+                                         (->Reiteration or-statement)
+                                         (->Var \r)))))))
 
 (deftest eliminate-equ-test
   (testing "eliminates Equ if one arg is the conclusion and the other is entailed by the assumptions"
