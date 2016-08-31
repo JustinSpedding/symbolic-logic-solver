@@ -68,7 +68,7 @@
   (deftest eliminate-or-test
     (testing "eliminates Or if both args entail the conclusion"
       (let [or-statement (->Or (->Var \p) (->Var \p))]
-        (is (= (->OrElimination or-statement
+        (is (= (->OrElimination (->Reiteration or-statement)
                                 (->Assumption (->Var \p) (->Reiteration (->Var \p)))
                                 (->Assumption (->Var \p) (->Reiteration (->Var \p)))
                                 (->Var \p))
