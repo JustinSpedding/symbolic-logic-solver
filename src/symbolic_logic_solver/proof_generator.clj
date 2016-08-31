@@ -80,13 +80,11 @@
         (map ->Reiteration assumptions)))
 
 (defn try-introduction [assumptions conclusion]
-  (case (type conclusion)
-    And (introduce-and assumptions conclusion)
-    Or  (introduce-or  assumptions conclusion)
-    Equ (introduce-equ assumptions conclusion)
-    Ent (introduce-ent assumptions conclusion)
-    Not (introduce-not assumptions conclusion)
-    nil))
+  (cond (And? conclusion) (introduce-and assumptions conclusion)
+        (Or?  conclusion) (introduce-or  assumptions conclusion)
+        (Equ? conclusion) (introduce-equ assumptions conclusion)
+        (Ent? conclusion) (introduce-ent assumptions conclusion)
+        (Not? conclusion) (introduce-not assumptions conclusion)))
 
 (defn generate-proof [assumptions conclusion]
   (if (entails? assumptions conclusion)
