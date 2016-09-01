@@ -62,7 +62,13 @@
       (->NotElimination last-step
                         conclusion))))
 
-(defn introduce-and [assumptions conclusion])
+(defn introduce-and [assumptions conclusion]
+  (if (and (entails? assumptions (:arg1 conclusion))
+           (entails? assumptions (:arg2 conclusion)))
+    (->AndIntroduction (generate-proof assumptions (:arg1 conclusion))
+                       (generate-proof assumptions (:arg2 conclusion))
+                       conclusion)))
+
 (defn introduce-or  [assumptions conclusion])
 (defn introduce-equ [assumptions conclusion])
 (defn introduce-ent [assumptions conclusion])

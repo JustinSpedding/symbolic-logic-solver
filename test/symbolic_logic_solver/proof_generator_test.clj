@@ -170,3 +170,23 @@
       (is (not (generator/eliminate-not (list not-statement)
                                         (->Reiteration not-statement)
                                         (->Var \q)))))))
+
+(deftest introduce-and-test
+  (testing "introduces And if both args are entailed by the assumptions"
+    (let [and-statement (->And (->Var \p) (->Var \q))]
+      (with-redefs [generator/generate-proof (fn [a b] "test")]
+        (is (= (->AndIntroduction "test" "test" and-statement)
+               (generator/introduce-and (list (->Var \p)
+                                              (->Var \q))
+                                        and-statement))))))
+
+  (testing "does not introduce And if either arg is not entailed by the assumptions"
+    (let [and-statement (->And (->Var \p) (->Var \q))]
+      (is (not (generator/introduce-and (list)
+                                        and-statement)))
+
+      (is (not (generator/introduce-and (list (->Var \p))
+                                        and-statement)))
+
+      (is (not (generator/introduce-and (list (->Var \q))
+                                        and-statement))))))
