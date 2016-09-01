@@ -22,6 +22,16 @@
 
     (is (not (atom? (->Not (->Not (->Var \p))))))))
 
+(deftest find-contradiction-test
+  (testing "returns a contradicting variable if one exists"
+    (is (= (->Var \p)
+           (find-contradiction (list (->Var \p)
+                                     (->Not (->Var \p)))))))
+
+  (testing "returns nil if there is no contradiction"
+    (is (not (find-contradiction (list (->Var \p)
+                                       (->Var \q)))))))
+
 (deftest consistent?-test
   (testing "corrently identifies consistent groups of statements"
     (is (consistent?))
@@ -55,6 +65,14 @@
                            (->Var \q))
                      (->Var \p)
                      (->Var \q)))
+
+    (is (consistent? (->Or (->Var \p)
+                           (->Var \q))
+                     (->Not (->Var \q))))
+
+    (is (consistent? (->Or (->Var \p)
+                           (->Var \q))
+                     (->Not (->Var \p))))
 
     (is (consistent? (->Equ (->Var \p)
                             (->Var \q))

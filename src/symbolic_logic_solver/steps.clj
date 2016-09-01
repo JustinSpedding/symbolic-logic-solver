@@ -15,3 +15,5 @@
 (defrecord Reiteration [conclusion])
 
 (defrecord Assumption [assumption conclusion])
+
+(defrecord Contradiction [assumption arg1 arg2])
