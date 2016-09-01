@@ -200,3 +200,29 @@
     (let [or-statement (->Or (->Var \p) (->Var \q))]
       (is (not (generator/introduce-or (list or-statement)
                                        or-statement))))))
+
+(deftest introduce-equ-test
+  (testing "introduces Equ if each arg can be used with the assumptions to reach the other"
+    (let [equ-statement (->Equ (->Var \p) (->Var \q))]
+      (with-redefs [generator/generate-proof (fn [a b] "test")]
+        (is (= (->EquIntroduction (->Assumption (->Var \p) "test")
+                                  (->Assumption (->Var \q) "test")
+                                  equ-statement)
+               (generator/introduce-equ (list (->Ent (->Var \p)
+                                                     (->Var \q))
+                                              (->Ent (->Var \q)
+                                                     (->Var \p)))
+                                        equ-statement))))))
+
+  (testing "does not introduce Equ if at least one arg can not be used with the assumptions to reach the other"
+    (let [equ-statement (->Equ (->Var \p) (->Var \q))]
+      (is (not (generator/introduce-equ (list)
+                                        equ-statement)))
+
+      (is (not (generator/introduce-equ (list (->Ent (->Var \p)
+                                                     (->Var \q)))
+                                        equ-statement)))
+
+      (is (not (generator/introduce-equ (list (->Ent (->Var \q)
+                                                     (->Var \p)))
+                                        equ-statement))))))

@@ -68,7 +68,15 @@
            (->OrIntroduction (generate-proof assumptions %) conclusion))
         [(:arg1 conclusion) (:arg2 conclusion)]))
 
-(defn introduce-equ [assumptions conclusion])
+(defn introduce-equ [assumptions conclusion]
+  (let [arg1 (:arg1 conclusion)
+        arg2 (:arg2 conclusion)]
+    (if (and (entails? (conj assumptions arg1) arg2)
+             (entails? (conj assumptions arg2) arg1))
+      (->EquIntroduction (->Assumption arg1 (generate-proof (conj assumptions arg1) arg2))
+                         (->Assumption arg2 (generate-proof (conj assumptions arg2) arg1))
+                         conclusion))))
+
 (defn introduce-ent [assumptions conclusion])
 (defn introduce-not [assumptions conclusion])
 
