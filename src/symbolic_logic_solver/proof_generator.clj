@@ -5,13 +5,7 @@
 (defn entails? [assumptions conclusion]
   (not (apply consistent? (conj assumptions (->Not conclusion)))))
 
-(declare try-elimination)
-(declare try-introduction)
 (declare generate-proof)
-
-(defn eliminate-var [assumptions last-step conclusion]
-  (if (= (:conclusion last-step) conclusion)
-    last-step))
 
 (defn eliminate-and [assumptions last-step conclusion]
   (let [assumption-to-eliminate (:conclusion last-step)
@@ -75,15 +69,19 @@
 (defn introduce-not [assumptions conclusion])
 (defn introduce-any [assumptions conclusion])
 
+(defn try-reiteration [assumptions conclusion]
+  (some #(if (= % conclusion)
+           (->Reiteration conclusion))
+        assumptions))
+
 ;; TODO make this smarter so that it prioritizes some statement types over others
 (defn try-elimination [assumptions conclusion]
-  (some #(cond (Var? (:conclusion %)) (eliminate-var assumptions % conclusion)
-               (And? (:conclusion %)) (eliminate-and assumptions % conclusion)
-               (Or?  (:conclusion %)) (eliminate-or  assumptions % conclusion)
-               (Equ? (:conclusion %)) (eliminate-equ assumptions % conclusion)
-               (Ent? (:conclusion %)) (eliminate-ent assumptions % conclusion)
-               (Not? (:conclusion %)) (eliminate-not assumptions % conclusion))
-        (map ->Reiteration assumptions)))
+  (some #(cond (And? %) (eliminate-and assumptions (->Reiteration %) conclusion)
+               (Or?  %) (eliminate-or  assumptions (->Reiteration %) conclusion)
+               (Equ? %) (eliminate-equ assumptions (->Reiteration %) conclusion)
+               (Ent? %) (eliminate-ent assumptions (->Reiteration %) conclusion)
+               (Not? %) (eliminate-not assumptions (->Reiteration %) conclusion))
+        assumptions))
 
 (defn try-introduction [assumptions conclusion]
   (cond (And? conclusion) (introduce-and assumptions conclusion)
@@ -94,6 +92,7 @@
 
 (defn generate-proof [assumptions conclusion]
   (if (entails? assumptions conclusion)
-    (or (try-elimination assumptions conclusion)
+    (or (try-reiteration assumptions conclusion)
+        (try-elimination assumptions conclusion)
         (try-introduction assumptions conclusion)
         (introduce-any assumptions conclusion))))

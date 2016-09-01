@@ -28,18 +28,6 @@
     (is (not (generator/entails? (list (->Var \p))
                                  (->Var \q))))))
 
-(deftest eliminate-var-test
-  (testing "returns the last step if it reaches the conclusion"
-    (is (= (->Reiteration (->Var \p))
-           (generator/eliminate-var ()
-                                    (->Reiteration (->Var \p))
-                                    (->Var \p)))))
-
-  (testing "returns nil if the last step does not reach the conclusion"
-    (is (not (generator/eliminate-var ()
-                                      (->Reiteration (->Var \p))
-                                      (->Var \q))))))
-
 (deftest eliminate-and-test
   (testing "eliminates And if an arg is the conclusion"
     (let [and-statement (->And (->Var \p) (->Var \q))]
