@@ -226,3 +226,20 @@
       (is (not (generator/introduce-equ (list (->Ent (->Var \q)
                                                      (->Var \p)))
                                         equ-statement))))))
+
+(deftest introduce-ent-test
+  (testing "introduces Ent if arg1 and the assumptions entail arg2"
+    (let [ent-statement (->Ent (->Var \p) (->Var \q))]
+      (with-redefs [generator/generate-proof (fn [a b] "test")]
+        (is (= (->EntIntroduction (->Assumption (->Var \p) "test") ent-statement)
+               (generator/introduce-ent (list (->Var \q))
+                                        ent-statement)))
+
+        (is (= (->EntIntroduction (->Assumption (->Var \p) "test") ent-statement)
+               (generator/introduce-ent (list (->Not (->Var \p)))
+                                        ent-statement))))))
+
+  (testing "does not introduce Ent if arg1 and the assumptons do not entail arg2"
+    (let [ent-statement (->Ent (->Var \p) (->Var \q))]
+      (is (not (generator/introduce-ent (list)
+                                        ent-statement))))))

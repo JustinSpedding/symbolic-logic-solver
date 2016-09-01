@@ -63,7 +63,7 @@
                        (generate-proof assumptions (:arg2 conclusion))
                        conclusion)))
 
-(defn introduce-or  [assumptions conclusion]
+(defn introduce-or [assumptions conclusion]
   (some #(if (entails? assumptions %)
            (->OrIntroduction (generate-proof assumptions %) conclusion))
         [(:arg1 conclusion) (:arg2 conclusion)]))
@@ -77,7 +77,13 @@
                          (->Assumption arg2 (generate-proof (conj assumptions arg2) arg1))
                          conclusion))))
 
-(defn introduce-ent [assumptions conclusion])
+(defn introduce-ent [assumptions conclusion]
+  (let [arg1 (:arg1 conclusion)
+        arg2 (:arg2 conclusion)]
+    (if (entails? (conj assumptions arg1) arg2)
+      (->EntIntroduction (->Assumption arg1 (generate-proof (conj assumptions arg1) arg2))
+                         conclusion))))
+
 (defn introduce-not [assumptions conclusion])
 
 (defn try-reiteration [assumptions conclusion]
@@ -103,6 +109,7 @@
 
 (defn indirect-proof [assumptions conclusion])
 
+;; TODO do not check entails? within this function
 (defn generate-proof [assumptions conclusion]
   (if (entails? assumptions conclusion)
     (or (try-reiteration assumptions conclusion)
