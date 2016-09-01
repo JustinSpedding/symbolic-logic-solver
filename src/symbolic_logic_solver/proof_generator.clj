@@ -67,7 +67,6 @@
 (defn introduce-equ [assumptions conclusion])
 (defn introduce-ent [assumptions conclusion])
 (defn introduce-not [assumptions conclusion])
-(defn introduce-any [assumptions conclusion])
 
 (defn try-reiteration [assumptions conclusion]
   (some #(if (= % conclusion)
@@ -90,9 +89,11 @@
         (Ent? conclusion) (introduce-ent assumptions conclusion)
         (Not? conclusion) (introduce-not assumptions conclusion)))
 
+(defn indirect-proof [assumptions conclusion])
+
 (defn generate-proof [assumptions conclusion]
   (if (entails? assumptions conclusion)
     (or (try-reiteration assumptions conclusion)
         (try-elimination assumptions conclusion)
         (try-introduction assumptions conclusion)
-        (introduce-any assumptions conclusion))))
+        (indirect-proof assumptions conclusion))))
