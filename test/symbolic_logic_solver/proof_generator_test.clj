@@ -178,3 +178,25 @@
 
       (is (not (generator/introduce-and (list (->Var \q))
                                         and-statement))))))
+
+(deftest introduce-or-test
+  (testing "introduces Or if at least one arg is entailed by the assumptions"
+    (let [or-statement (->Or (->Var \p) (->Var \q))]
+      (with-redefs [generator/generate-proof (fn [a b] "test")]
+        (is (= (->OrIntroduction "test" or-statement)
+               (generator/introduce-or (list (->Var \p))
+                                       or-statement)))
+
+        (is (= (->OrIntroduction "test" or-statement)
+               (generator/introduce-or (list (->Var \q))
+                                       or-statement)))
+
+        (is (= (->OrIntroduction "test" or-statement)
+               (generator/introduce-or (list (->Var \p)
+                                             (->Var \q))
+                                       or-statement))))))
+
+  (testing "does not introduce Or if neither arg is entailed by the conclusion"
+    (let [or-statement (->Or (->Var \p) (->Var \q))]
+      (is (not (generator/introduce-or (list or-statement)
+                                       or-statement))))))

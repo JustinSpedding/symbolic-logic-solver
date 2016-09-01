@@ -63,7 +63,11 @@
                        (generate-proof assumptions (:arg2 conclusion))
                        conclusion)))
 
-(defn introduce-or  [assumptions conclusion])
+(defn introduce-or  [assumptions conclusion]
+  (some #(if (entails? assumptions %)
+           (->OrIntroduction (generate-proof assumptions %) conclusion))
+        [(:arg1 conclusion) (:arg2 conclusion)]))
+
 (defn introduce-equ [assumptions conclusion])
 (defn introduce-ent [assumptions conclusion])
 (defn introduce-not [assumptions conclusion])
