@@ -15,11 +15,6 @@
 (defn Ent? [statement] (= Ent (type statement)))
 (defn Not? [statement] (= Not (type statement)))
 
-(defn atom? [statement]
-  (or (Var? statement)
-      (and (Not? statement)
-           (Var? (:arg1 statement)))))
-
 (defn- find-contradiction-worker [statements true-vars false-vars]
   (loop [statements statements
          true-vars true-vars
