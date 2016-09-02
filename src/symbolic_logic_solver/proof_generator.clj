@@ -8,18 +8,18 @@
 (declare generate-proof)
 
 (defn eliminate-and [assumptions last-step conclusion]
-  (let [assumption-to-eliminate (:conclusion last-step)
-        arg1 (:arg1 assumption-to-eliminate)
-        arg2 (:arg2 assumption-to-eliminate)]
+  (let [statement-to-eliminate (:conclusion last-step)
+        arg1 (:arg1 statement-to-eliminate)
+        arg2 (:arg2 statement-to-eliminate)]
     (some #(if (= % conclusion)
              (->AndElimination last-step %))
           [arg1 arg2])))
 
 ;; TODO make this smarter so that other assumptions can be used inside
 (defn eliminate-or [assumptions last-step conclusion]
-  (let [assumption-to-eliminate (:conclusion last-step)
-        arg1 (:arg1 assumption-to-eliminate)
-        arg2 (:arg2 assumption-to-eliminate)]
+  (let [statement-to-eliminate (:conclusion last-step)
+        arg1 (:arg1 statement-to-eliminate)
+        arg2 (:arg2 statement-to-eliminate)]
     (if (and (entails? (list arg1) conclusion)
              (entails? (list arg2) conclusion))
       (->OrElimination last-step
@@ -28,20 +28,20 @@
                        conclusion))))
 
 (defn eliminate-equ [assumptions last-step conclusion]
-  (let [assumption-to-eliminate (:conclusion last-step)
-        arg1 (:arg1 assumption-to-eliminate)
-        arg2 (:arg2 assumption-to-eliminate)]
+  (let [statement-to-eliminate (:conclusion last-step)
+        arg1 (:arg1 statement-to-eliminate)
+        arg2 (:arg2 statement-to-eliminate)]
     (some #(if (and (= (first %) conclusion)
                     (entails? assumptions (second %)))
              (->EquElimination last-step
-                               (generate-proof (remove (fn [x] (= assumption-to-eliminate x)) assumptions) (second %))
+                               (generate-proof (remove (fn [x] (= statement-to-eliminate x)) assumptions) (second %))
                                conclusion))
           [[arg1 arg2] [arg2 arg1]])))
 
 (defn eliminate-ent [assumptions last-step conclusion]
-  (let [assumption-to-eliminate (:conclusion last-step)
-        arg1 (:arg1 assumption-to-eliminate)
-        arg2 (:arg2 assumption-to-eliminate)]
+  (let [statement-to-eliminate (:conclusion last-step)
+        arg1 (:arg1 statement-to-eliminate)
+        arg2 (:arg2 statement-to-eliminate)]
     (if (and (= arg2 conclusion)
              (entails? assumptions arg1))
       (->EntElimination last-step
@@ -49,8 +49,8 @@
                         conclusion))))
 
 (defn eliminate-not [assumptions last-step conclusion]
-  (let [assumption-to-eliminate (:conclusion last-step)
-        arg1 (:arg1 assumption-to-eliminate)]
+  (let [statement-to-eliminate (:conclusion last-step)
+        arg1 (:arg1 statement-to-eliminate)]
     (if (and (Not? arg1)
              (= (:arg1 arg1) conclusion))
       (->NotElimination last-step
