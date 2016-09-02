@@ -1,4 +1,4 @@
-(ns symbolic-logic-solver.statement-converter
+(ns symbolic-logic-solver.statement-parser
   (:require [symbolic-logic-solver.symbols :as symbols]
             [symbolic-logic-solver.statements :refer :all]))
 
