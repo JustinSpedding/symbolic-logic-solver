@@ -24,7 +24,7 @@
       (if-let [statement (first statements)]
         (cond (Var? statement) (recur (rest statements) (conj true-vars statement) false-vars)
               (And? statement) (recur (conj (rest statements) (:arg1 statement) (:arg2 statement)) true-vars false-vars)
-              (Or? statement)  (and (find-contradiction-worker (conj (rest statements) (:arg1 statement)) true-vars false-vars)
+              (Or?  statement) (and (find-contradiction-worker (conj (rest statements) (:arg1 statement)) true-vars false-vars)
                                     (find-contradiction-worker (conj (rest statements) (:arg2 statement)) true-vars false-vars))
               (Equ? statement) (and (find-contradiction-worker (conj (rest statements) (:arg1 statement) (:arg2 statement)) true-vars false-vars)
                                     (find-contradiction-worker (conj (rest statements) (->Not (:arg1 statement)) (->Not (:arg2 statement))) true-vars false-vars))
@@ -34,7 +34,7 @@
                                  (cond (Var? inner-statement) (recur (rest statements) true-vars (conj false-vars inner-statement))
                                        (And? inner-statement) (and (find-contradiction-worker (conj (rest statements) (->Not (:arg1 inner-statement))) true-vars false-vars)
                                                                    (find-contradiction-worker (conj (rest statements) (->Not (:arg2 inner-statement))) true-vars false-vars))
-                                       (Or? inner-statement)  (recur (conj (rest statements) (->Not (:arg1 inner-statement)) (->Not (:arg2 inner-statement))) true-vars false-vars)
+                                       (Or?  inner-statement) (recur (conj (rest statements) (->Not (:arg1 inner-statement)) (->Not (:arg2 inner-statement))) true-vars false-vars)
                                        (Equ? inner-statement) (and (find-contradiction-worker (conj (rest statements) (:arg1 inner-statement) (->Not (:arg2 inner-statement))) true-vars false-vars)
                                                                    (find-contradiction-worker (conj (rest statements) (->Not (:arg1 inner-statement)) (:arg2 inner-statement)) true-vars false-vars))
                                        (Ent? inner-statement) (recur (conj (rest statements) (:arg1 inner-statement) (->Not (:arg2 inner-statement))) true-vars false-vars)
