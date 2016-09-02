@@ -261,3 +261,17 @@
     (let [not-statement (->Not (->Or (->Var \p) (->Var \q)))]
       (is (not (generator/introduce-not (list (->Not (->Var \p)))
                                         not-statement))))))
+
+(deftest indirect-proof-test
+  (testing "uses indirect proof if the assumptions entail conclusion"
+    (is (= (->NotElimination (->NotIntroduction (->Contradiction (->Not (->Var \p))
+                                                                 (->Reiteration (->Var \p))
+                                                                 (->Reiteration (->Not (->Var \p))))
+                                                (->Not (->Not (->Var \p))))
+                             (->Var \p))
+           (generator/indirect-proof (list (->Var \p))
+                                     (->Var \p)))))
+
+  (testing "does not use indirect proof if the assumptions do not entail the conclusion"
+    (is (not (generator/indirect-proof (list (->Var \q))
+                                       (->Var \p))))))

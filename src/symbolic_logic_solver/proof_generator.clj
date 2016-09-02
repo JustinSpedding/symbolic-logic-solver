@@ -88,8 +88,8 @@
   (let [new-assumptions (conj assumptions (:arg1 conclusion))]
     (if-let [contradiction (find-contradiction new-assumptions)]
       (->NotIntroduction (->Contradiction (:arg1 conclusion)
-                                          (generate-proof assumptions contradiction)
-                                          (generate-proof assumptions (->Not contradiction)))
+                                          (generate-proof (conj assumptions (:arg1 conclusion)) contradiction)
+                                          (generate-proof (conj assumptions (:arg1 conclusion)) (->Not contradiction)))
                          conclusion))))
 
 (defn try-reiteration [assumptions conclusion]
@@ -113,7 +113,9 @@
         (Ent? conclusion) (introduce-ent assumptions conclusion)
         (Not? conclusion) (introduce-not assumptions conclusion)))
 
-(defn indirect-proof [assumptions conclusion])
+(defn indirect-proof [assumptions conclusion]
+  (if-let [proof (introduce-not assumptions (->Not (->Not conclusion)))]
+    (->NotElimination proof conclusion)))
 
 ;; TODO do not check entails? within this function
 (defn generate-proof [assumptions conclusion]
