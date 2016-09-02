@@ -243,3 +243,21 @@
     (let [ent-statement (->Ent (->Var \p) (->Var \q))]
       (is (not (generator/introduce-ent (list)
                                         ent-statement))))))
+
+(deftest introduce-not-test
+  (testing "introduces Not if assuming arg1 leads to a contradiction"
+    (let [not-statement (->Not (->Or (->Var \p) (->Var \q)))]
+      (with-redefs [generator/generate-proof (fn [a b] "test")
+                    find-contradiction (fn [a] (->Var \p))]
+        (is (= (->NotIntroduction (->Contradiction (:arg1 not-statement)
+                                                   "test"
+                                                   "test")
+                                  not-statement)
+               (generator/introduce-not (list (->Not (->Var \p))
+                                              (->Not (->Var \p)))
+                                        not-statement))))))
+
+  (testing "does not introduce Not if arg1 does not lead to a contradiction"
+    (let [not-statement (->Not (->Or (->Var \p) (->Var \q)))]
+      (is (not (generator/introduce-not (list (->Not (->Var \p)))
+                                        not-statement))))))

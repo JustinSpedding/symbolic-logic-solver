@@ -84,7 +84,13 @@
       (->EntIntroduction (->Assumption arg1 (generate-proof (conj assumptions arg1) arg2))
                          conclusion))))
 
-(defn introduce-not [assumptions conclusion])
+(defn introduce-not [assumptions conclusion]
+  (let [new-assumptions (conj assumptions (:arg1 conclusion))]
+    (if-let [contradiction (find-contradiction new-assumptions)]
+      (->NotIntroduction (->Contradiction (:arg1 conclusion)
+                                          (generate-proof assumptions contradiction)
+                                          (generate-proof assumptions (->Not contradiction)))
+                         conclusion))))
 
 (defn try-reiteration [assumptions conclusion]
   (some #(if (= % conclusion)
