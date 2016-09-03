@@ -275,3 +275,17 @@
   (testing "does not use indirect proof when the assumptions do not entail the conclusion"
     (is (not (generator/indirect-proof (list (->Var \q))
                                        (->Var \p))))))
+
+(deftest try-introduction-test
+  (testing "prioritizes elimination of specific statements"
+    (let [and-statement (->And (->Var \p) (->Var \p))
+          or-statement  (->Or  (->Var \p) (->Var \p))]
+      (is (= (->AndElimination (->Reiteration and-statement) (->Var \p))
+             (generator/try-elimination (list and-statement
+                                              or-statement)
+                                        (->Var \p))))
+
+      (is (= (->AndElimination (->Reiteration and-statement) (->Var \p))
+             (generator/try-elimination (list or-statement
+                                              and-statement)
+                                        (->Var \p)))))))

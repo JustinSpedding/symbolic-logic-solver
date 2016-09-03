@@ -45,3 +45,5 @@
 
 (defn consistent? [& statements]
   (not (find-contradiction statements)))
+
+(defn statement-priority [statement] ({Not 0 And 1 Ent 2 Equ 3 Or 4} (type statement)))

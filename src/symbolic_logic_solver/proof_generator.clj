@@ -97,14 +97,13 @@
            (->Reiteration conclusion))
         assumptions))
 
-;; TODO make this smarter so that it prioritizes some statement types over others
 (defn try-elimination [assumptions conclusion]
   (some #(cond (And? %) (eliminate-and assumptions (->Reiteration %) conclusion)
                (Or?  %) (eliminate-or  assumptions (->Reiteration %) conclusion)
                (Equ? %) (eliminate-equ assumptions (->Reiteration %) conclusion)
                (Ent? %) (eliminate-ent assumptions (->Reiteration %) conclusion)
                (Not? %) (eliminate-not assumptions (->Reiteration %) conclusion))
-        assumptions))
+        (sort-by statement-priority assumptions)))
 
 (defn try-introduction [assumptions conclusion]
   (cond (And? conclusion) (introduce-and assumptions conclusion)
