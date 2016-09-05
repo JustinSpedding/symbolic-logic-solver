@@ -9,13 +9,22 @@
 (def entails-operator \>)
 (def not-operator \~)
 
-(defn binary-operator? [op] (#{and-operator
-                               or-operator
-                               equivalent-operator
-                               entails-operator} op))
+(defn binary-operator? [op]
+  (#{and-operator
+     or-operator
+     equivalent-operator
+     entails-operator} op))
 
-(defn char-to-record-constructor [op] ({and-operator ->And
-                                        or-operator ->Or
-                                        equivalent-operator ->Equ
-                                        entails-operator ->Ent
-                                        not-operator ->Not} op))
+(defn char-to-record-constructor [op]
+  ({and-operator ->And
+    or-operator ->Or
+    equivalent-operator ->Equ
+    entails-operator ->Ent
+    not-operator ->Not} op))
+
+(defn statement->operator [statement]
+  (cond (And? statement) and-operator
+        (Or?  statement) or-operator
+        (Equ? statement) equivalent-operator
+        (Ent? statement) entails-operator
+        (Not? statement) not-operator))
