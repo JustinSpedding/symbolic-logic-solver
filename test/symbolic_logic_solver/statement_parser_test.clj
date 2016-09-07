@@ -17,48 +17,48 @@
   (testing "does not break with empty stack"
     (is (= (list) (#'parser/pop-while-removed-item-makes-predicate-true (list) identity)))))
 
-(deftest infix-to-postfix-test
+(deftest infix->postfix-test
   (testing "does it work"
-    (is (= "ppv" (#'parser/infix-to-postfix "pvp")))
-    (is (= "pq&" (#'parser/infix-to-postfix "p&q")))
-    (is (= "pq>" (#'parser/infix-to-postfix "p>q")))
-    (is (= "pq=" (#'parser/infix-to-postfix "p=q")))
-    (is (= "ppv" (#'parser/infix-to-postfix "(pvp)")))
-    (is (= "p~" (#'parser/infix-to-postfix "~p")))
-    (is (= "p~p~v" (#'parser/infix-to-postfix "~pv~p")))
-    (is (= "p~~" (#'parser/infix-to-postfix "(~~p)")))
-    (is (= "p" (#'parser/infix-to-postfix "p")))
-    (is (= "pqvrs&=" (#'parser/infix-to-postfix "(pvq)=(r&s)")))
-    (is (= "pqr&=" (#'parser/infix-to-postfix "p=(q&r)")))
-    (is (= "pq&~" (#'parser/infix-to-postfix "~(p&q)")))))
+    (is (= "ppv" (#'parser/infix->postfix "pvp")))
+    (is (= "pq&" (#'parser/infix->postfix "p&q")))
+    (is (= "pq>" (#'parser/infix->postfix "p>q")))
+    (is (= "pq=" (#'parser/infix->postfix "p=q")))
+    (is (= "ppv" (#'parser/infix->postfix "(pvp)")))
+    (is (= "p~" (#'parser/infix->postfix "~p")))
+    (is (= "p~p~v" (#'parser/infix->postfix "~pv~p")))
+    (is (= "p~~" (#'parser/infix->postfix "(~~p)")))
+    (is (= "p" (#'parser/infix->postfix "p")))
+    (is (= "pqvrs&=" (#'parser/infix->postfix "(pvq)=(r&s)")))
+    (is (= "pqr&=" (#'parser/infix->postfix "p=(q&r)")))
+    (is (= "pq&~" (#'parser/infix->postfix "~(p&q)")))))
 
-(deftest postfix-to-statement-test
+(deftest postfix->statement-test
   (testing "does it work"
-    (is (= (->Var \p) (#'parser/postfix-to-statement "p")))
+    (is (= (->Var \p) (#'parser/postfix->statement "p")))
 
     (is (= (->And (->Var \p)
-                  (->Var \q)) (#'parser/postfix-to-statement "pq&")))
+                  (->Var \q)) (#'parser/postfix->statement "pq&")))
 
     (is (= (->Or (->Var \p)
-                 (->Var \q)) (#'parser/postfix-to-statement "pqv")))
+                 (->Var \q)) (#'parser/postfix->statement "pqv")))
 
     (is (= (->Equ (->Var \p)
-                  (->Var \q)) (#'parser/postfix-to-statement "pq=")))
+                  (->Var \q)) (#'parser/postfix->statement "pq=")))
 
     (is (= (->Ent (->Var \p)
-                  (->Var \q)) (#'parser/postfix-to-statement "pq>")))
+                  (->Var \q)) (#'parser/postfix->statement "pq>")))
 
     (is (= (->Not (->And (->Var \p)
-                         (->Var \q))) (#'parser/postfix-to-statement "pq&~")))
+                         (->Var \q))) (#'parser/postfix->statement "pq&~")))
 
     (is (= (->Equ (->Or (->Var \p)
                         (->Var \q))
                   (->And (->Var \r)
-                         (->Var \s))) (#'parser/postfix-to-statement "pqvrs&=")))))
+                         (->Var \s))) (#'parser/postfix->statement "pqvrs&=")))))
 
-(deftest string-to-statement-test
+(deftest string->statement-test
   (testing "does it work"
     (is (= (->Equ (->Or (->Var \p)
                         (->Var \q))
                   (->And (->Var \r)
-                         (->Var \s))) (parser/string-to-statement "((pvq)=(r&s))")))))
+                         (->Var \s))) (parser/string->statement "((pvq)=(r&s))")))))

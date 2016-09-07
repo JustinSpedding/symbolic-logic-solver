@@ -10,8 +10,8 @@
   (println "Hello, World!"))
 
 (defn prove [assumptions conclusion]
-  (let [assumptions (map parser/string-to-statement assumptions)
-        conclusion (parser/string-to-statement conclusion)]
+  (let [assumptions (map parser/string->statement assumptions)
+        conclusion (parser/string->statement conclusion)]
     (if (generator/entails? assumptions conclusion)
       (formatter/format-proof (generator/generate-proof assumptions conclusion))
       "The assumptions do not entail the conclusion.")))

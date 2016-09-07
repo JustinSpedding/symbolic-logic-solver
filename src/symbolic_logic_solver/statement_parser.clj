@@ -12,7 +12,7 @@
       (recur (pop stack))
       stack)))
 
-(defn- infix-to-postfix [infix]
+(defn- infix->postfix [infix]
   (loop [remaining infix
          stack (list)
          output ""]
@@ -34,7 +34,7 @@
                                                            (str output current-char)))
       (apply str output stack))))
 
-(defn- postfix-to-statement [postfix]
+(defn- postfix->statement [postfix]
   (loop [remaining postfix
          stack (list)]
     (if-let [current-char (first remaining)]
@@ -46,8 +46,8 @@
                                                            (conj stack (->Var current-char))))
       (first stack))))
 
-(defn string-to-statement [input-string]
+(defn string->statement [input-string]
   (-> input-string
       remove-whitespace
-      infix-to-postfix
-      postfix-to-statement))
+      infix->postfix
+      postfix->statement))
