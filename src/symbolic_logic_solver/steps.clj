@@ -13,7 +13,21 @@
 (defrecord NotIntroduction [arg1 conclusion])
 
 (defrecord Reiteration [conclusion])
-
 (defrecord Assumption [assumption conclusion])
-
 (defrecord Contradiction [assumption arg1 arg2])
+
+(defn AndElimination? [step] (= AndElimination (type step)))
+(defn OrElimination?  [step] (= OrElimination  (type step)))
+(defn EquElimination? [step] (= EquElimination (type step)))
+(defn EntElimination? [step] (= EntElimination (type step)))
+(defn NotElimination? [step] (= NotElimination (type step)))
+
+(defn AndIntroduction? [step] (= AndIntroduction (type step)))
+(defn OrIntroduction?  [step] (= OrIntroduction  (type step)))
+(defn EquIntroduction? [step] (= EquIntroduction (type step)))
+(defn EntIntroduction? [step] (= EntIntroduction (type step)))
+(defn NotIntroduction? [step] (= NotIntroduction (type step)))
+
+(defn Reiteration? [step] (= Reiteration (type step)))
+(defn Assumption? [step] (= Assumption (type step)))
+(defn Contradiction? [step] (= Contradiction (type step)))
