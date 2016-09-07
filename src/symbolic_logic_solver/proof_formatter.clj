@@ -16,14 +16,29 @@
 
 (declare step->lines)
 
-(defn AndElimination->lines [step]
-  (cons (->Line (statement->string (:conclusion step))
-                (str and-operator "E %d")
-                (list (->Reference (:conclusion (:arg1 step) nil)))
-                0)
-        (step->lines (:arg1 step))))
+(defn indent-level [lines]
+  (map #(update-in % [:level] inc) lines))
 
-(defn OrElimination->lines [step])
+(defn AndElimination->lines [step]
+  (conj (step->lines (:arg1 step))
+        (->Line (statement->string (:conclusion step))
+                (str and-operator "E %d")
+                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil))
+                0)))
+
+(defn OrElimination->lines [step]
+  (conj (concat (indent-level (step->lines (:arg3 step)))
+                (indent-level (step->lines (:arg2 step)))
+                (step->lines (:arg1 step)))
+        (->Line (statement->string (:conclusion step))
+                (str or-operator "E %d, %d-%d, %d-%d")
+                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil)
+                      (->Reference nil (statement->string (:assumption (:arg2 step))))
+                      (->Reference (statement->string (:conclusion (:arg1 (:arg2 step)))) (statement->string (:assumption (:arg2 step))))
+                      (->Reference nil (statement->string (:assumption (:arg3 step))))
+                      (->Reference (statement->string (:conclusion (:arg1 (:arg3 step)))) (statement->string (:assumption (:arg3 step)))))
+                0)))
+
 (defn EquElimination->lines [step])
 (defn EntElimination->lines [step])
 (defn NotElimination->lines [step])

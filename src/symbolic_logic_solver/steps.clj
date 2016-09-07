@@ -13,7 +13,7 @@
 (defrecord NotIntroduction [arg1 conclusion])
 
 (defrecord Reiteration [conclusion])
-(defrecord Assumption [assumption conclusion])
+(defrecord Assumption [assumption arg1])
 (defrecord Contradiction [assumption arg1 arg2])
 
 (defn AndElimination? [step] (= AndElimination (type step)))
