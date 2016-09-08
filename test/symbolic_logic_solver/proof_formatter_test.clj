@@ -55,3 +55,17 @@
                                                               (->Assumption (->Var \q)
                                                                             (->Reiteration (->Var \r)))
                                                               (->Var \r))))))))
+(deftest EquElimination->lines-test
+  (testing "converts to line correctly"
+    (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "p" "R %d" (list "p") 0)))]
+      (is (= (list (formatter/->Line "q"
+                                     "=E %d, %d"
+                                     (list (formatter/->Reference "(p=q)" nil)
+                                           (formatter/->Reference "p" nil))
+                                     0)
+                   (formatter/->Line "p" "R %d" (list "p") 0)
+                   (formatter/->Line "p" "R %d" (list "p") 0))
+             (formatter/EquElimination->lines (->EquElimination (->Reiteration (->Equ (->Var \p)
+                                                                                      (->Var \q)))
+                                                                (->Reiteration (->Var \p))
+                                                                (->Var \q))))))))

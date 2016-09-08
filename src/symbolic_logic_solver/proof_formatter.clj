@@ -39,7 +39,15 @@
                       (->Reference (statement->string (:conclusion (:arg1 (:arg3 step)))) (statement->string (:assumption (:arg3 step)))))
                 0)))
 
-(defn EquElimination->lines [step])
+(defn EquElimination->lines [step]
+  (conj (concat (step->lines (:arg2 step))
+                (step->lines (:arg1 step)))
+        (->Line (statement->string (:conclusion step))
+                (str equivalent-operator "E %d, %d")
+                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil)
+                      (->Reference (statement->string (:conclusion (:arg2 step))) nil))
+                0)))
+
 (defn EntElimination->lines [step])
 (defn NotElimination->lines [step])
 (defn AndIntroduction->lines [step])
