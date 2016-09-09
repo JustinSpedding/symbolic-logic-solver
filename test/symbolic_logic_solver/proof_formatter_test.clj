@@ -69,3 +69,18 @@
                                                                                       (->Var \q)))
                                                                 (->Reiteration (->Var \p))
                                                                 (->Var \q))))))))
+
+(deftest EntElimination->lines-test
+  (testing "converts to line correctly"
+    (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "p" "R %d" (list "p") 0)))]
+      (is (= (list (formatter/->Line "q"
+                                     ">E %d, %d"
+                                     (list (formatter/->Reference "(p>q)" nil)
+                                           (formatter/->Reference "p" nil))
+                                     0)
+                   (formatter/->Line "p" "R %d" (list "p") 0)
+                   (formatter/->Line "p" "R %d" (list "p") 0))
+             (formatter/EntElimination->lines (->EntElimination (->Reiteration (->Ent (->Var \p)
+                                                                                      (->Var \q)))
+                                                                (->Reiteration (->Var \p))
+                                                                (->Var \q))))))))

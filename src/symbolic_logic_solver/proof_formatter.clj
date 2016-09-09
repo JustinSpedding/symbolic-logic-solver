@@ -48,7 +48,15 @@
                       (->Reference (statement->string (:conclusion (:arg2 step))) nil))
                 0)))
 
-(defn EntElimination->lines [step])
+(defn EntElimination->lines [step]
+  (conj (concat (step->lines (:arg2 step))
+                (step->lines (:arg1 step)))
+        (->Line (statement->string (:conclusion step))
+                (str entails-operator "E %d, %d")
+                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil)
+                      (->Reference (statement->string (:conclusion (:arg2 step))) nil))
+                0)))
+
 (defn NotElimination->lines [step])
 (defn AndIntroduction->lines [step])
 (defn OrIntroduction->lines [step])
