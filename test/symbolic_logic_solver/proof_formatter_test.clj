@@ -84,3 +84,14 @@
                                                                                       (->Var \q)))
                                                                 (->Reiteration (->Var \p))
                                                                 (->Var \q))))))))
+
+(deftest NotElimination->lines-test
+  (testing "converts to line correctly"
+    (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "p" "R %d" (list "p") 0)))]
+      (is (= (list (formatter/->Line "p"
+                                     "~E %d"
+                                     (list (formatter/->Reference "~~p" nil))
+                                     0)
+                   (formatter/->Line "p" "R %d" (list "p") 0))
+             (formatter/NotElimination->lines (->NotElimination (->Reiteration (->Not (->Not (->Var \p))))
+                                                                (->Var \p))))))))

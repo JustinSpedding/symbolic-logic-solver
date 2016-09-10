@@ -57,7 +57,13 @@
                       (->Reference (statement->string (:conclusion (:arg2 step))) nil))
                 0)))
 
-(defn NotElimination->lines [step])
+(defn NotElimination->lines [step]
+  (conj (step->lines (:arg1 step))
+        (->Line (statement->string (:conclusion step))
+                (str not-operator "E %d")
+                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil))
+                0)))
+
 (defn AndIntroduction->lines [step])
 (defn OrIntroduction->lines [step])
 (defn EquIntroduction->lines [step])
