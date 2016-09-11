@@ -95,3 +95,17 @@
                    (formatter/->Line "p" "R %d" (list "p") 0))
              (formatter/NotElimination->lines (->NotElimination (->Reiteration (->Not (->Not (->Var \p))))
                                                                 (->Var \p))))))))
+
+(deftest AndIntroduction->lines-test
+  (testing "converts to line correctly"
+    (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "p" "R %d" (list "p") 0)))]
+      (is (= (list (formatter/->Line "(p&q)"
+                                     "&I %d, %d"
+                                     (list (formatter/->Reference "p" nil)
+                                           (formatter/->Reference "q" nil))
+                                     0)
+                   (formatter/->Line "p" "R %d" (list "p") 0)
+                   (formatter/->Line "p" "R %d" (list "p") 0))
+             (formatter/AndIntroduction->lines (->AndIntroduction (->Reiteration (->Var \p))
+                                                                  (->Reiteration (->Var \q))
+                                                                  (->And (->Var \p) (->Var \q)))))))))

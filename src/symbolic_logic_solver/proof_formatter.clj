@@ -64,7 +64,15 @@
                 (list (->Reference (statement->string (:conclusion (:arg1 step))) nil))
                 0)))
 
-(defn AndIntroduction->lines [step])
+(defn AndIntroduction->lines [step]
+  (conj (concat (step->lines (:arg2 step))
+                (step->lines (:arg1 step)))
+        (->Line (statement->string (:conclusion step))
+                (str and-operator "I %d, %d")
+                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil)
+                      (->Reference (statement->string (:conclusion (:arg2 step))) nil))
+                0)))
+
 (defn OrIntroduction->lines [step])
 (defn EquIntroduction->lines [step])
 (defn EntIntroduction->lines [step])
