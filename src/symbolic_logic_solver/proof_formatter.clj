@@ -73,7 +73,13 @@
                       (->Reference (statement->string (:conclusion (:arg2 step))) nil))
                 0)))
 
-(defn OrIntroduction->lines [step])
+(defn OrIntroduction->lines [step]
+  (conj (step->lines (:arg1 step))
+        (->Line (statement->string (:conclusion step))
+                (str or-operator "I %d")
+                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil))
+                0)))
+
 (defn EquIntroduction->lines [step])
 (defn EntIntroduction->lines [step])
 (defn NotIntroduction->lines [step])

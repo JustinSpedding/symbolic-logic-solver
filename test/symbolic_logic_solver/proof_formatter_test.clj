@@ -109,3 +109,14 @@
              (formatter/AndIntroduction->lines (->AndIntroduction (->Reiteration (->Var \p))
                                                                   (->Reiteration (->Var \q))
                                                                   (->And (->Var \p) (->Var \q)))))))))
+
+(deftest OrIntroduction->lines-test
+  (testing "converts to line correctly"
+    (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "p" "R %d" (list "p") 0)))]
+      (is (= (list (formatter/->Line "(pvq)"
+                                     "vI %d"
+                                     (list (formatter/->Reference "p" nil))
+                                     0)
+                   (formatter/->Line "p" "R %d" (list "p") 0))
+             (formatter/OrIntroduction->lines (->OrIntroduction (->Reiteration (->Var \p))
+                                                                (->Or (->Var \p) (->Var \q)))))))))
