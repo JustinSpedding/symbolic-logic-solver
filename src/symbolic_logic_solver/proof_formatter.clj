@@ -19,12 +19,15 @@
 (defn indent-level [lines]
   (map #(update-in % [:level] inc) lines))
 
-(defn AndElimination->lines [step]
-  (conj (step->lines (:arg1 step))
-        (->Line (statement->string (:conclusion step))
-                (str and-operator "E %d")
-                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil))
-                0)))
+(defmacro defn-line-converter [fn-name reference-string args-to-reference]
+  (list 'defn fn-name ['step]
+    (list 'conj (apply list 'concat (map #(list 'step->lines (list % 'step)) (reverse args-to-reference)))
+      (list '->Line (list 'statement->string (list ':conclusion 'step))
+                    reference-string
+                    (apply list 'list (map #(list '->Reference (list 'statement->string (list ':conclusion (list % 'step))) 'nil) args-to-reference))
+                    '0))))
+
+(defn-line-converter AndElimination->lines (str and-operator "E %d") [:arg1])
 
 (defn OrElimination->lines [step]
   (conj (concat (indent-level (step->lines (:arg3 step)))
@@ -39,46 +42,15 @@
                       (->Reference (statement->string (:conclusion (:arg1 (:arg3 step)))) (statement->string (:assumption (:arg3 step)))))
                 0)))
 
-(defn EquElimination->lines [step]
-  (conj (concat (step->lines (:arg2 step))
-                (step->lines (:arg1 step)))
-        (->Line (statement->string (:conclusion step))
-                (str equivalent-operator "E %d, %d")
-                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil)
-                      (->Reference (statement->string (:conclusion (:arg2 step))) nil))
-                0)))
+(defn-line-converter EquElimination->lines (str equivalent-operator "E %d, %d") [:arg1 :arg2])
 
-(defn EntElimination->lines [step]
-  (conj (concat (step->lines (:arg2 step))
-                (step->lines (:arg1 step)))
-        (->Line (statement->string (:conclusion step))
-                (str entails-operator "E %d, %d")
-                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil)
-                      (->Reference (statement->string (:conclusion (:arg2 step))) nil))
-                0)))
+(defn-line-converter EntElimination->lines (str entails-operator "E %d, %d") [:arg1 :arg2])
 
-(defn NotElimination->lines [step]
-  (conj (step->lines (:arg1 step))
-        (->Line (statement->string (:conclusion step))
-                (str not-operator "E %d")
-                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil))
-                0)))
+(defn-line-converter NotElimination->lines (str not-operator "E %d") [:arg1])
 
-(defn AndIntroduction->lines [step]
-  (conj (concat (step->lines (:arg2 step))
-                (step->lines (:arg1 step)))
-        (->Line (statement->string (:conclusion step))
-                (str and-operator "I %d, %d")
-                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil)
-                      (->Reference (statement->string (:conclusion (:arg2 step))) nil))
-                0)))
+(defn-line-converter AndIntroduction->lines (str and-operator "I %d, %d") [:arg1 :arg2])
 
-(defn OrIntroduction->lines [step]
-  (conj (step->lines (:arg1 step))
-        (->Line (statement->string (:conclusion step))
-                (str or-operator "I %d")
-                (list (->Reference (statement->string (:conclusion (:arg1 step))) nil))
-                0)))
+(defn-line-converter OrIntroduction->lines (str or-operator "I %d") [:arg1])
 
 (defn EquIntroduction->lines [step])
 (defn EntIntroduction->lines [step])
