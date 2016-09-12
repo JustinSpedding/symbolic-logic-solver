@@ -108,7 +108,8 @@
                    (formatter/->Line "p" "R %d" (list "p") 0))
              (formatter/AndIntroduction->lines (->AndIntroduction (->Reiteration (->Var \p))
                                                                   (->Reiteration (->Var \q))
-                                                                  (->And (->Var \p) (->Var \q)))))))))
+                                                                  (->And (->Var \p)
+                                                                         (->Var \q)))))))))
 
 (deftest OrIntroduction->lines-test
   (testing "converts to line correctly"
@@ -119,4 +120,27 @@
                                      0)
                    (formatter/->Line "p" "R %d" (list "p") 0))
              (formatter/OrIntroduction->lines (->OrIntroduction (->Reiteration (->Var \p))
-                                                                (->Or (->Var \p) (->Var \q)))))))))
+                                                                (->Or (->Var \p)
+                                                                      (->Var \q)))))))))
+
+(deftest EquIntroduction->lines-test
+  (testing "converts to line correctly"
+    (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "p" "R %d" (list "p") 0)
+                                                      (formatter/->AssumptionLine "p" 0)))]
+      (is (= (list (formatter/->Line "(p=q)"
+                                     "=I %d-%d, %d-%d"
+                                     (list (formatter/->Reference nil "p")
+                                           (formatter/->Reference "q" "p")
+                                           (formatter/->Reference nil "q")
+                                           (formatter/->Reference "p" "q"))
+                                     0)
+                   (formatter/->Line "p" "R %d" (list "p") 1)
+                   (formatter/->AssumptionLine "p" 1)
+                   (formatter/->Line "p" "R %d" (list "p") 1)
+                   (formatter/->AssumptionLine "p" 1))
+             (formatter/EquIntroduction->lines (->EquIntroduction (->Assumption (->Var \p)
+                                                                                (->Reiteration (->Var \q)))
+                                                                  (->Assumption (->Var \q)
+                                                                                (->Reiteration (->Var \p)))
+                                                                  (->Equ (->Var \p)
+                                                                         (->Var \q)))))))))

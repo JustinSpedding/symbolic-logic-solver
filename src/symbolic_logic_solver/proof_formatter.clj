@@ -3,8 +3,9 @@
             [symbolic-logic-solver.steps :refer :all]
             [symbolic-logic-solver.symbols :refer :all]))
 
-(defrecord Line [statement step-type references level])
-(defrecord AssumptionLine [assumption level])
+(defrecord Line [statement step-type references indentation])
+(defrecord AssumptionLine [assumption indentation])
+
 (defrecord Reference [statement assumption])
 
 (defn statement->string [x]
@@ -16,8 +17,8 @@
 
 (declare step->lines)
 
-(defn indent-level [lines]
-  (map #(update-in % [:level] inc) lines))
+(defn indent [lines]
+  (map #(update-in % [:indentation] inc) lines))
 
 (defmacro defn-line-converter [fn-name reference-string args-to-reference]
   (list 'defn fn-name ['step]
@@ -30,8 +31,8 @@
 (defn-line-converter AndElimination->lines (str and-operator "E %d") [:arg1])
 
 (defn OrElimination->lines [step]
-  (conj (concat (indent-level (step->lines (:arg3 step)))
-                (indent-level (step->lines (:arg2 step)))
+  (conj (concat (indent (step->lines (:arg3 step)))
+                (indent (step->lines (:arg2 step)))
                 (step->lines (:arg1 step)))
         (->Line (statement->string (:conclusion step))
                 (str or-operator "E %d, %d-%d, %d-%d")
@@ -52,7 +53,17 @@
 
 (defn-line-converter OrIntroduction->lines (str or-operator "I %d") [:arg1])
 
-(defn EquIntroduction->lines [step])
+(defn EquIntroduction->lines [step]
+  (conj (concat (indent (step->lines (:arg2 step)))
+                (indent (step->lines (:arg1 step))))
+        (->Line (statement->string (:conclusion step))
+                (str equivalent-operator "I %d-%d, %d-%d")
+                (list (->Reference nil (statement->string (:assumption (:arg1 step))))
+                      (->Reference (statement->string (:conclusion (:arg1 (:arg1 step)))) (statement->string (:assumption (:arg1 step))))
+                      (->Reference nil (statement->string (:assumption (:arg2 step))))
+                      (->Reference (statement->string (:conclusion (:arg1 (:arg2 step)))) (statement->string (:assumption (:arg2 step)))))
+                0)))
+
 (defn EntIntroduction->lines [step])
 (defn NotIntroduction->lines [step])
 (defn Reiteration->lines [step])
