@@ -56,7 +56,8 @@
 
 (defn-line-converter EntIntroduction->lines (str entails-operator "I %d-%d") [[:assumption :arg1]])
 
-(defn NotIntroduction->lines [step])
+(defn-line-converter NotIntroduction->lines (str not-operator "I %d(%d, %d)") [[:contradiction :arg1]])
+
 (defn Reiteration->lines [step])
 (defn Assumption->lines [step])
 (defn Contradiction->lines [step])

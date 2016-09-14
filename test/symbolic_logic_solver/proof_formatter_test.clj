@@ -160,3 +160,22 @@
                                                                                 (->Reiteration (->Var \q)))
                                                                   (->Ent (->Var \p)
                                                                          (->Var \q)))))))))
+
+(deftest NotIntroduction->lines-test
+  (testing "converts to line correctly"
+    (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "~q" "R %d" (list "~q") 0)
+                                                      (formatter/->Line "q" "R %d" (list "q") 0)
+                                                      (formatter/->AssumptionLine "p" 0)))]
+      (is (= (list (formatter/->Line "~p"
+                                     "~I %d(%d, %d)"
+                                     (list (formatter/->Reference nil "p")
+                                           (formatter/->Reference "q" "p")
+                                           (formatter/->Reference "~q" "p"))
+                                     0)
+                   (formatter/->Line "~q" "R %d" (list "~q") 1)
+                   (formatter/->Line "q" "R %d" (list "q") 1)
+                   (formatter/->AssumptionLine "p" 1))
+             (formatter/NotIntroduction->lines (->NotIntroduction (->Contradiction (->Var \p)
+                                                                                   (->Reiteration (->Var \q))
+                                                                                   (->Reiteration (->Not (->Var \q))))
+                                                                  (->Not (->Var \p)))))))))
