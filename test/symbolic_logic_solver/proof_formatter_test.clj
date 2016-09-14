@@ -144,3 +144,19 @@
                                                                                 (->Reiteration (->Var \p)))
                                                                   (->Equ (->Var \p)
                                                                          (->Var \q)))))))))
+
+(deftest EntIntroduction->lines-test
+  (testing "converts to line correctly"
+    (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "p" "R %d" (list "p") 0)
+                                                      (formatter/->AssumptionLine "p" 0)))]
+      (is (= (list (formatter/->Line "(p>q)"
+                                     ">I %d-%d"
+                                     (list (formatter/->Reference nil "p")
+                                           (formatter/->Reference "q" "p"))
+                                     0)
+                   (formatter/->Line "p" "R %d" (list "p") 1)
+                   (formatter/->AssumptionLine "p" 1))
+             (formatter/EntIntroduction->lines (->EntIntroduction (->Assumption (->Var \p)
+                                                                                (->Reiteration (->Var \q)))
+                                                                  (->Ent (->Var \p)
+                                                                         (->Var \q)))))))))
