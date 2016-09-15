@@ -20,7 +20,7 @@
 (defn indent [lines]
   (map #(update-in % [:indentation] inc) lines))
 
-(defmacro defn-line-converter [fn-name reference-string args-to-reference]
+(defmacro defn-line-converter [fn-name reference-string & args-to-reference]
   (list 'defn fn-name ['step]
     (list 'conj (apply list 'concat (map #(case (first %)
                                             :statement (list 'step->lines (list (second %) 'step))
@@ -38,25 +38,25 @@
                                            args-to-reference))
                     '0))))
 
-(defn-line-converter AndElimination->lines (str and-operator "E %d") [[:statement :arg1]])
+(defn-line-converter AndElimination->lines (str and-operator "E %d") [:statement :arg1])
 
-(defn-line-converter OrElimination->lines (str or-operator "E %d, %d-%d, %d-%d") [[:statement :arg1] [:assumption :arg2] [:assumption :arg3]])
+(defn-line-converter OrElimination->lines (str or-operator "E %d, %d-%d, %d-%d") [:statement :arg1] [:assumption :arg2] [:assumption :arg3])
 
-(defn-line-converter EquElimination->lines (str equivalent-operator "E %d, %d") [[:statement :arg1] [:statement :arg2]])
+(defn-line-converter EquElimination->lines (str equivalent-operator "E %d, %d") [:statement :arg1] [:statement :arg2])
 
-(defn-line-converter EntElimination->lines (str entails-operator "E %d, %d") [[:statement :arg1] [:statement :arg2]])
+(defn-line-converter EntElimination->lines (str entails-operator "E %d, %d") [:statement :arg1] [:statement :arg2])
 
-(defn-line-converter NotElimination->lines (str not-operator "E %d") [[:statement :arg1]])
+(defn-line-converter NotElimination->lines (str not-operator "E %d") [:statement :arg1])
 
-(defn-line-converter AndIntroduction->lines (str and-operator "I %d, %d") [[:statement :arg1] [:statement :arg2]])
+(defn-line-converter AndIntroduction->lines (str and-operator "I %d, %d") [:statement :arg1] [:statement :arg2])
 
-(defn-line-converter OrIntroduction->lines (str or-operator "I %d") [[:statement :arg1]])
+(defn-line-converter OrIntroduction->lines (str or-operator "I %d") [:statement :arg1])
 
-(defn-line-converter EquIntroduction->lines (str equivalent-operator "I %d-%d, %d-%d") [[:assumption :arg1] [:assumption :arg2]])
+(defn-line-converter EquIntroduction->lines (str equivalent-operator "I %d-%d, %d-%d") [:assumption :arg1] [:assumption :arg2])
 
-(defn-line-converter EntIntroduction->lines (str entails-operator "I %d-%d") [[:assumption :arg1]])
+(defn-line-converter EntIntroduction->lines (str entails-operator "I %d-%d") [:assumption :arg1])
 
-(defn-line-converter NotIntroduction->lines (str not-operator "I %d(%d, %d)") [[:contradiction :arg1]])
+(defn-line-converter NotIntroduction->lines (str not-operator "I %d(%d, %d)") [:contradiction :arg1])
 
 (defn Reiteration->lines [step]
   (list (->Line (statement->string (:conclusion step))
