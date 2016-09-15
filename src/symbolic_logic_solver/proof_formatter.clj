@@ -58,7 +58,12 @@
 
 (defn-line-converter NotIntroduction->lines (str not-operator "I %d(%d, %d)") [[:contradiction :arg1]])
 
-(defn Reiteration->lines [step])
+(defn Reiteration->lines [step]
+  (list (->Line (statement->string (:conclusion step))
+                "R %d"
+                (list (->Reference nil (statement->string (:conclusion step))))
+                0)))
+
 (defn Assumption->lines [step])
 (defn Contradiction->lines [step])
 

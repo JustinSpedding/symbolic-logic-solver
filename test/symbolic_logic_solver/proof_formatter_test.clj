@@ -179,3 +179,11 @@
                                                                                    (->Reiteration (->Var \q))
                                                                                    (->Reiteration (->Not (->Var \q))))
                                                                   (->Not (->Var \p)))))))))
+
+(deftest Reiteration->lines-test
+  (testing "converts to line correctly"
+    (is (= (list (formatter/->Line "p"
+                                   "R %d"
+                                   (list (formatter/->Reference nil "p"))
+                                   0))
+           (formatter/Reiteration->lines (->Reiteration (->Var \p)))))))
