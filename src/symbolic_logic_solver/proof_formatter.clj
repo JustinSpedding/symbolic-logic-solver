@@ -64,7 +64,10 @@
                 (list (->Reference nil (statement->string (:conclusion step))))
                 0)))
 
-(defn Assumption->lines [step])
+(defn Assumption->lines [step]
+  (concat (step->lines (:arg1 step))
+          (list (->AssumptionLine (statement->string (:assumption step)) 0))))
+
 (defn Contradiction->lines [step])
 
 (defn step->lines [step]

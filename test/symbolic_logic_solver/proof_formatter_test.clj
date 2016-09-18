@@ -187,3 +187,13 @@
                                    (list (formatter/->Reference nil "p"))
                                    0))
            (formatter/Reiteration->lines (->Reiteration (->Var \p)))))))
+
+(deftest Assumption->lines-test
+  (testing "converts to line correctly"
+    (is (= (list (formatter/->Line "p"
+                                   "R %d"
+                                   (list (formatter/->Reference nil "p"))
+                                   0)
+                 (formatter/->AssumptionLine "p" 0))
+           (formatter/Assumption->lines (->Assumption (->Var \p)
+                                                      (->Reiteration (->Var \p))))))))
