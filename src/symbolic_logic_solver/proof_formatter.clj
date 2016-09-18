@@ -39,23 +39,15 @@
                     '0))))
 
 (defn-line-converter AndElimination->lines (str and-operator "E %d") [:statement :arg1])
-
 (defn-line-converter OrElimination->lines (str or-operator "E %d, %d-%d, %d-%d") [:statement :arg1] [:assumption :arg2] [:assumption :arg3])
-
 (defn-line-converter EquElimination->lines (str equivalent-operator "E %d, %d") [:statement :arg1] [:statement :arg2])
-
 (defn-line-converter EntElimination->lines (str entails-operator "E %d, %d") [:statement :arg1] [:statement :arg2])
-
 (defn-line-converter NotElimination->lines (str not-operator "E %d") [:statement :arg1])
 
 (defn-line-converter AndIntroduction->lines (str and-operator "I %d, %d") [:statement :arg1] [:statement :arg2])
-
 (defn-line-converter OrIntroduction->lines (str or-operator "I %d") [:statement :arg1])
-
 (defn-line-converter EquIntroduction->lines (str equivalent-operator "I %d-%d, %d-%d") [:assumption :arg1] [:assumption :arg2])
-
 (defn-line-converter EntIntroduction->lines (str entails-operator "I %d-%d") [:assumption :arg1])
-
 (defn-line-converter NotIntroduction->lines (str not-operator "I %d(%d, %d)") [:contradiction :arg1])
 
 (defn Reiteration->lines [step]
@@ -68,7 +60,10 @@
   (concat (step->lines (:arg1 step))
           (list (->AssumptionLine (statement->string (:assumption step)) 0))))
 
-(defn Contradiction->lines [step])
+(defn Contradiction->lines [step]
+  (concat (step->lines (:arg2 step))
+          (step->lines (:arg1 step))
+          (list (->AssumptionLine (statement->string (:assumption step)) 0))))
 
 (defn step->lines [step]
   (cond (AndElimination? step) (AndElimination->lines step)

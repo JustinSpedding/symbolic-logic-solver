@@ -197,3 +197,18 @@
                  (formatter/->AssumptionLine "p" 0))
            (formatter/Assumption->lines (->Assumption (->Var \p)
                                                       (->Reiteration (->Var \p))))))))
+
+(deftest Contradiction->lines-test
+  (testing "converts to line correctly"
+    (is (= (list (formatter/->Line "~q"
+                                   "R %d"
+                                   (list (formatter/->Reference nil "~q"))
+                                   0)
+                 (formatter/->Line "q"
+                                   "R %d"
+                                   (list (formatter/->Reference nil "q"))
+                                   0)
+                 (formatter/->AssumptionLine "p" 0))
+           (formatter/Contradiction->lines (->Contradiction (->Var \p)
+                                                            (->Reiteration (->Var \q))
+                                                            (->Reiteration (->Not (->Var \q)))))))))
