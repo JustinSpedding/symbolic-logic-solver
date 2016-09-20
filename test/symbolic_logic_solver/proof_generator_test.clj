@@ -41,15 +41,15 @@
                                       (->Reiteration and-statement)
                                       (->Var \q))))
 
-      (is (= (->AndElimination (->Reiteration and-statement) (->Var \p))
-             (generator/eliminate-and (list and-statement
-                                            (->And and-statement (->Var \r)))
-                                      (->Reiteration and-statement)
+      (is (= (->AndElimination (->AndElimination (->Reiteration (->And and-statement (->Var \r))) and-statement) (->Var \p))
+             (generator/eliminate-and (list (->And and-statement (->Var \r)))
+                                      (->Reiteration (->And and-statement (->Var \r)))
                                       (->Var \p))))))
 
   (testing "does not eliminate And when neither arg is the conclusion"
     (let [and-statement (->And (->Var \p) (->Var \q))]
-      (is (not (generator/eliminate-and (list and-statement (->Var \r))
+      (is (not (generator/eliminate-and (list and-statement
+                                              (->Var \r))
                                         (->Reiteration and-statement)
                                         (->Var \r)))))))
 

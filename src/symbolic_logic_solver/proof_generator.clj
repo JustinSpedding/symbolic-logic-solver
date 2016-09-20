@@ -6,13 +6,24 @@
   (not (apply consistent? (conj assumptions (->Not conclusion)))))
 
 (declare generate-proof)
+(declare eliminate-and)
+(declare eliminate-or)
+(declare eliminate-equ)
+(declare eliminate-ent)
+(declare eliminate-not)
 
 (defn eliminate-and [assumptions last-step conclusion]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)
         arg2 (:arg2 statement-to-eliminate)]
-    (some #(if (= % conclusion)
-             (->AndElimination last-step %))
+    (some #(if (and (entails? (list %) conclusion)
+                    (not (entails? (list) conclusion)))
+               (cond (= conclusion %) (->AndElimination last-step %)
+                     (And? %) (eliminate-and assumptions (->AndElimination last-step %) conclusion)
+                     (Or?  %) (eliminate-or  assumptions (->AndElimination last-step %) conclusion)
+                     (Equ? %) (eliminate-equ assumptions (->AndElimination last-step %) conclusion)
+                     (Ent? %) (eliminate-ent assumptions (->AndElimination last-step %) conclusion)
+                     (Not? %) (eliminate-not assumptions (->AndElimination last-step %) conclusion)))
           [arg1 arg2])))
 
 ;; TODO make this smarter so that other assumptions can be used inside
