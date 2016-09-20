@@ -94,8 +94,8 @@
   (let [index (first indexed-line)
         line (second indexed-line)
         indents (clojure.string/join (repeat (:indentation line) "|"))]
-    (cond (= Line (type line)) (str index ": |" indents (:statement line) " " (apply format (:step-type line) (map #(find-referenced-statement % indexed-lines indexed-line) (:references line))))
-          (= AssumptionLine (type line)) (str index ": |" indents (:statement line) \newline "   |" indents "----------------"))))
+    (cond (= Line (type line)) (str (format "%3d" index) ": |" indents (:statement line) " " (apply format (:step-type line) (map #(find-referenced-statement % indexed-lines indexed-line) (:references line))))
+          (= AssumptionLine (type line)) (str (format "%3d" index) ": |" indents (:statement line) \newline "     |" indents "----------------"))))
 
 (defn format-proof [assumptions proof]
   (let [indexed-lines (->> proof
