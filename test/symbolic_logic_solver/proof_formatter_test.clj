@@ -23,7 +23,7 @@
     (with-redefs [formatter/step->lines (fn [_] (list "test"))]
       (is (= (list (formatter/->Line "p"
                                      "&E %d"
-                                     (list (formatter/->Reference "(p&q)" nil))
+                                     (list (formatter/->StatementReference "(p&q)"))
                                      0)
                    "test")
              (formatter/AndElimination->lines (->AndElimination (->Reiteration (->And (->Var \p)
@@ -36,11 +36,11 @@
                                                       (formatter/->AssumptionLine "p" 0)))]
       (is (= (list (formatter/->Line "r"
                                      "vE %d, %d-%d, %d-%d"
-                                     (list (formatter/->Reference "(pvq)" nil)
-                                           (formatter/->Reference nil "p")
-                                           (formatter/->Reference "r" "p")
-                                           (formatter/->Reference nil "q")
-                                           (formatter/->Reference "r" "q"))
+                                     (list (formatter/->StatementReference "(pvq)")
+                                           (formatter/->AssumptionReference "p")
+                                           (formatter/->InnerAssumptionReference "r" "p")
+                                           (formatter/->AssumptionReference "q")
+                                           (formatter/->InnerAssumptionReference "r" "q"))
                                      0)
                    (formatter/->Line "p" "R %d" (list "p") 1)
                    (formatter/->AssumptionLine "p" 1)
@@ -60,8 +60,8 @@
     (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "p" "R %d" (list "p") 0)))]
       (is (= (list (formatter/->Line "q"
                                      "=E %d, %d"
-                                     (list (formatter/->Reference "(p=q)" nil)
-                                           (formatter/->Reference "p" nil))
+                                     (list (formatter/->StatementReference "(p=q)")
+                                           (formatter/->StatementReference "p"))
                                      0)
                    (formatter/->Line "p" "R %d" (list "p") 0)
                    (formatter/->Line "p" "R %d" (list "p") 0))
@@ -75,8 +75,8 @@
     (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "p" "R %d" (list "p") 0)))]
       (is (= (list (formatter/->Line "q"
                                      ">E %d, %d"
-                                     (list (formatter/->Reference "(p>q)" nil)
-                                           (formatter/->Reference "p" nil))
+                                     (list (formatter/->StatementReference "(p>q)")
+                                           (formatter/->StatementReference "p"))
                                      0)
                    (formatter/->Line "p" "R %d" (list "p") 0)
                    (formatter/->Line "p" "R %d" (list "p") 0))
@@ -90,7 +90,7 @@
     (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "p" "R %d" (list "p") 0)))]
       (is (= (list (formatter/->Line "p"
                                      "~E %d"
-                                     (list (formatter/->Reference "~~p" nil))
+                                     (list (formatter/->StatementReference "~~p"))
                                      0)
                    (formatter/->Line "p" "R %d" (list "p") 0))
              (formatter/NotElimination->lines (->NotElimination (->Reiteration (->Not (->Not (->Var \p))))
@@ -101,8 +101,8 @@
     (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "p" "R %d" (list "p") 0)))]
       (is (= (list (formatter/->Line "(p&q)"
                                      "&I %d, %d"
-                                     (list (formatter/->Reference "p" nil)
-                                           (formatter/->Reference "q" nil))
+                                     (list (formatter/->StatementReference "p")
+                                           (formatter/->StatementReference "q"))
                                      0)
                    (formatter/->Line "p" "R %d" (list "p") 0)
                    (formatter/->Line "p" "R %d" (list "p") 0))
@@ -116,7 +116,7 @@
     (with-redefs [formatter/step->lines (fn [_] (list (formatter/->Line "p" "R %d" (list "p") 0)))]
       (is (= (list (formatter/->Line "(pvq)"
                                      "vI %d"
-                                     (list (formatter/->Reference "p" nil))
+                                     (list (formatter/->StatementReference "p"))
                                      0)
                    (formatter/->Line "p" "R %d" (list "p") 0))
              (formatter/OrIntroduction->lines (->OrIntroduction (->Reiteration (->Var \p))
@@ -129,10 +129,10 @@
                                                       (formatter/->AssumptionLine "p" 0)))]
       (is (= (list (formatter/->Line "(p=q)"
                                      "=I %d-%d, %d-%d"
-                                     (list (formatter/->Reference nil "p")
-                                           (formatter/->Reference "q" "p")
-                                           (formatter/->Reference nil "q")
-                                           (formatter/->Reference "p" "q"))
+                                     (list (formatter/->AssumptionReference "p")
+                                           (formatter/->InnerAssumptionReference "q" "p")
+                                           (formatter/->AssumptionReference "q")
+                                           (formatter/->InnerAssumptionReference "p" "q"))
                                      0)
                    (formatter/->Line "p" "R %d" (list "p") 1)
                    (formatter/->AssumptionLine "p" 1)
@@ -151,8 +151,8 @@
                                                       (formatter/->AssumptionLine "p" 0)))]
       (is (= (list (formatter/->Line "(p>q)"
                                      ">I %d-%d"
-                                     (list (formatter/->Reference nil "p")
-                                           (formatter/->Reference "q" "p"))
+                                     (list (formatter/->AssumptionReference "p")
+                                           (formatter/->InnerAssumptionReference "q" "p"))
                                      0)
                    (formatter/->Line "p" "R %d" (list "p") 1)
                    (formatter/->AssumptionLine "p" 1))
@@ -168,9 +168,9 @@
                                                       (formatter/->AssumptionLine "p" 0)))]
       (is (= (list (formatter/->Line "~p"
                                      "~I %d(%d, %d)"
-                                     (list (formatter/->Reference nil "p")
-                                           (formatter/->Reference "q" "p")
-                                           (formatter/->Reference "~q" "p"))
+                                     (list (formatter/->AssumptionReference "p")
+                                           (formatter/->InnerAssumptionReference "q" "p")
+                                           (formatter/->InnerAssumptionReference "~q" "p"))
                                      0)
                    (formatter/->Line "~q" "R %d" (list "~q") 1)
                    (formatter/->Line "q" "R %d" (list "q") 1)
@@ -184,7 +184,7 @@
   (testing "converts to line correctly"
     (is (= (list (formatter/->Line "p"
                                    "R %d"
-                                   (list (formatter/->Reference nil "p"))
+                                   (list (formatter/->ReiterationReference "p"))
                                    0))
            (formatter/Reiteration->lines (->Reiteration (->Var \p)))))))
 
@@ -192,7 +192,7 @@
   (testing "converts to line correctly"
     (is (= (list (formatter/->Line "p"
                                    "R %d"
-                                   (list (formatter/->Reference nil "p"))
+                                   (list (formatter/->ReiterationReference "p"))
                                    0)
                  (formatter/->AssumptionLine "p" 0))
            (formatter/Assumption->lines (->Assumption (->Var \p)
@@ -202,11 +202,11 @@
   (testing "converts to line correctly"
     (is (= (list (formatter/->Line "~q"
                                    "R %d"
-                                   (list (formatter/->Reference nil "~q"))
+                                   (list (formatter/->ReiterationReference "~q"))
                                    0)
                  (formatter/->Line "q"
                                    "R %d"
-                                   (list (formatter/->Reference nil "q"))
+                                   (list (formatter/->ReiterationReference "q"))
                                    0)
                  (formatter/->AssumptionLine "p" 0))
            (formatter/Contradiction->lines (->Contradiction (->Var \p)
