@@ -164,42 +164,42 @@
     (let [and-statement (->And (->Var \p) (->Var \q))]
       (with-redefs [generator/generate-proof (fn [a b] "test")]
         (is (= (->AndIntroduction "test" "test" and-statement)
-               (generator/introduce-and (list (->Var \p)
-                                              (->Var \q))
-                                        and-statement))))))
+               (generator/introduce (list (->Var \p)
+                                          (->Var \q))
+                                    and-statement))))))
 
   (testing "does not introduce And when either arg is not entailed by the assumptions"
     (let [and-statement (->And (->Var \p) (->Var \q))]
-      (is (not (generator/introduce-and (list)
-                                        and-statement)))
+      (is (not (generator/introduce (list)
+                                    and-statement)))
 
-      (is (not (generator/introduce-and (list (->Var \p))
-                                        and-statement)))
+      (is (not (generator/introduce (list (->Var \p))
+                                    and-statement)))
 
-      (is (not (generator/introduce-and (list (->Var \q))
-                                        and-statement))))))
+      (is (not (generator/introduce (list (->Var \q))
+                                    and-statement))))))
 
 (deftest introduce-or-test
   (testing "introduces Or when at least one arg is entailed by the assumptions"
     (let [or-statement (->Or (->Var \p) (->Var \q))]
       (with-redefs [generator/generate-proof (fn [a b] "test")]
         (is (= (->OrIntroduction "test" or-statement)
-               (generator/introduce-or (list (->Var \p))
-                                       or-statement)))
+               (generator/introduce (list (->Var \p))
+                                    or-statement)))
 
         (is (= (->OrIntroduction "test" or-statement)
-               (generator/introduce-or (list (->Var \q))
-                                       or-statement)))
+               (generator/introduce (list (->Var \q))
+                                    or-statement)))
 
         (is (= (->OrIntroduction "test" or-statement)
-               (generator/introduce-or (list (->Var \p)
-                                             (->Var \q))
-                                       or-statement))))))
+               (generator/introduce (list (->Var \p)
+                                          (->Var \q))
+                                    or-statement))))))
 
   (testing "does not introduce Or when neither arg is entailed by the conclusion"
     (let [or-statement (->Or (->Var \p) (->Var \q))]
-      (is (not (generator/introduce-or (list or-statement)
-                                       or-statement))))))
+      (is (not (generator/introduce (list or-statement)
+                                    or-statement))))))
 
 (deftest introduce-equ-test
   (testing "introduces Equ when each arg can be used with the assumptions to reach the other"
@@ -208,41 +208,41 @@
         (is (= (->EquIntroduction (->Assumption (->Var \p) "test")
                                   (->Assumption (->Var \q) "test")
                                   equ-statement)
-               (generator/introduce-equ (list (->Ent (->Var \p)
-                                                     (->Var \q))
-                                              (->Ent (->Var \q)
-                                                     (->Var \p)))
-                                        equ-statement))))))
+               (generator/introduce (list (->Ent (->Var \p)
+                                                 (->Var \q))
+                                          (->Ent (->Var \q)
+                                                 (->Var \p)))
+                                    equ-statement))))))
 
   (testing "does not introduce Equ when at least one arg can not be used with the assumptions to reach the other"
     (let [equ-statement (->Equ (->Var \p) (->Var \q))]
-      (is (not (generator/introduce-equ (list)
-                                        equ-statement)))
+      (is (not (generator/introduce (list)
+                                    equ-statement)))
 
-      (is (not (generator/introduce-equ (list (->Ent (->Var \p)
-                                                     (->Var \q)))
-                                        equ-statement)))
+      (is (not (generator/introduce (list (->Ent (->Var \p)
+                                                 (->Var \q)))
+                                    equ-statement)))
 
-      (is (not (generator/introduce-equ (list (->Ent (->Var \q)
-                                                     (->Var \p)))
-                                        equ-statement))))))
+      (is (not (generator/introduce (list (->Ent (->Var \q)
+                                                 (->Var \p)))
+                                    equ-statement))))))
 
 (deftest introduce-ent-test
   (testing "introduces Ent when arg1 and the assumptions entail arg2"
     (let [ent-statement (->Ent (->Var \p) (->Var \q))]
       (with-redefs [generator/generate-proof (fn [a b] "test")]
         (is (= (->EntIntroduction (->Assumption (->Var \p) "test") ent-statement)
-               (generator/introduce-ent (list (->Var \q))
-                                        ent-statement)))
+               (generator/introduce (list (->Var \q))
+                                    ent-statement)))
 
         (is (= (->EntIntroduction (->Assumption (->Var \p) "test") ent-statement)
-               (generator/introduce-ent (list (->Not (->Var \p)))
-                                        ent-statement))))))
+               (generator/introduce (list (->Not (->Var \p)))
+                                    ent-statement))))))
 
   (testing "does not introduce Ent when arg1 and the assumptons do not entail arg2"
     (let [ent-statement (->Ent (->Var \p) (->Var \q))]
-      (is (not (generator/introduce-ent (list)
-                                        ent-statement))))))
+      (is (not (generator/introduce (list)
+                                    ent-statement))))))
 
 (deftest introduce-not-test
   (testing "introduces Not when assuming arg1 leads to a contradiction"
@@ -253,14 +253,14 @@
                                                    "test"
                                                    "test")
                                   not-statement)
-               (generator/introduce-not (list (->Not (->Var \p))
-                                              (->Not (->Var \p)))
-                                        not-statement))))))
+               (generator/introduce (list (->Not (->Var \p))
+                                          (->Not (->Var \p)))
+                                    not-statement))))))
 
   (testing "does not introduce Not when arg1 does not lead to a contradiction"
     (let [not-statement (->Not (->Or (->Var \p) (->Var \q)))]
-      (is (not (generator/introduce-not (list (->Not (->Var \p)))
-                                        not-statement))))))
+      (is (not (generator/introduce (list (->Not (->Var \p)))
+                                    not-statement))))))
 
 (deftest indirect-proof-test
   (testing "uses indirect proof when the assumptions entail conclusion"

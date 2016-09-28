@@ -62,19 +62,23 @@
       (->NotElimination last-step
                         conclusion))))
 
-(defn introduce-and [assumptions conclusion]
+(defmulti introduce (fn [assumptions conclusion] (class conclusion)))
+
+(defmethod introduce Var [assumptions conclusion] nil)
+
+(defmethod introduce And [assumptions conclusion]
   (if (and (entails? assumptions (:arg1 conclusion))
            (entails? assumptions (:arg2 conclusion)))
     (->AndIntroduction (generate-proof assumptions (:arg1 conclusion))
                        (generate-proof assumptions (:arg2 conclusion))
                        conclusion)))
 
-(defn introduce-or [assumptions conclusion]
+(defmethod introduce Or [assumptions conclusion]
   (some #(if (entails? assumptions %)
            (->OrIntroduction (generate-proof assumptions %) conclusion))
         [(:arg1 conclusion) (:arg2 conclusion)]))
 
-(defn introduce-equ [assumptions conclusion]
+(defmethod introduce Equ [assumptions conclusion]
   (let [arg1 (:arg1 conclusion)
         arg2 (:arg2 conclusion)]
     (if (and (entails? (conj assumptions arg1) arg2)
@@ -83,14 +87,14 @@
                          (->Assumption arg2 (generate-proof (conj assumptions arg2) arg1))
                          conclusion))))
 
-(defn introduce-ent [assumptions conclusion]
+(defmethod introduce Ent [assumptions conclusion]
   (let [arg1 (:arg1 conclusion)
         arg2 (:arg2 conclusion)]
     (if (entails? (conj assumptions arg1) arg2)
       (->EntIntroduction (->Assumption arg1 (generate-proof (conj assumptions arg1) arg2))
                          conclusion))))
 
-(defn introduce-not [assumptions conclusion]
+(defmethod introduce Not [assumptions conclusion]
   (let [new-assumptions (conj assumptions (:arg1 conclusion))]
     (if-let [contradiction (find-contradiction new-assumptions)]
       (->NotIntroduction (->Contradiction (:arg1 conclusion)
@@ -108,14 +112,10 @@
         (sort-by statement-priority assumptions)))
 
 (defn try-introduction [assumptions conclusion]
-  (cond (And? conclusion) (introduce-and assumptions conclusion)
-        (Or?  conclusion) (introduce-or  assumptions conclusion)
-        (Equ? conclusion) (introduce-equ assumptions conclusion)
-        (Ent? conclusion) (introduce-ent assumptions conclusion)
-        (Not? conclusion) (introduce-not assumptions conclusion)))
+  (introduce assumptions conclusion))
 
 (defn indirect-proof [assumptions conclusion]
-  (if-let [proof (introduce-not assumptions (->Not (->Not conclusion)))]
+  (if-let [proof (introduce assumptions (->Not (->Not conclusion)))]
     (->NotElimination proof conclusion)))
 
 ;; TODO do not check entails? within this function
