@@ -11,9 +11,8 @@
       (formatter/format-proof assumptions (generator/generate-proof assumptions conclusion))
       "The assumptions do not entail the conclusion.")))
 
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
+(defn -main [& args]
+  (println "Enter your assumptions and conclusion: ")
   (let [input (clojure.string/split (read-line) #" ")]
     (println (prove (butlast input)
                     (last input)))))
