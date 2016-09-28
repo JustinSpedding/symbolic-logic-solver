@@ -1,33 +1,28 @@
 (ns symbolic-logic-solver.proof-generator
   (:require [symbolic-logic-solver.statements :refer :all]
-            [symbolic-logic-solver.steps :refer :all]))
+            [symbolic-logic-solver.steps :refer :all])
+  (:import [symbolic_logic_solver.statements Var And Or Equ Ent Not]))
 
 (defn entails? [assumptions conclusion]
   (not (apply consistent? (conj assumptions (->Not conclusion)))))
 
 (declare generate-proof)
-(declare eliminate-and)
-(declare eliminate-or)
-(declare eliminate-equ)
-(declare eliminate-ent)
-(declare eliminate-not)
 
-(defn eliminate-and [assumptions last-step conclusion]
+(defmulti eliminate (fn [assumptions step conclusion] (class (:conclusion step))))
+
+(defmethod eliminate And [assumptions last-step conclusion]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)
         arg2 (:arg2 statement-to-eliminate)]
     (some #(if (and (entails? (list %) conclusion)
                     (not (entails? (list) conclusion)))
-               (cond (= conclusion %) (->AndElimination last-step %)
-                     (And? %) (eliminate-and assumptions (->AndElimination last-step %) conclusion)
-                     (Or?  %) (eliminate-or  assumptions (->AndElimination last-step %) conclusion)
-                     (Equ? %) (eliminate-equ assumptions (->AndElimination last-step %) conclusion)
-                     (Ent? %) (eliminate-ent assumptions (->AndElimination last-step %) conclusion)
-                     (Not? %) (eliminate-not assumptions (->AndElimination last-step %) conclusion)))
+             (if (= conclusion %)
+               (->AndElimination last-step %)
+               (eliminate assumptions (->AndElimination last-step %) conclusion)))
           [arg1 arg2])))
 
 ;; TODO make this smarter so that other assumptions can be used inside
-(defn eliminate-or [assumptions last-step conclusion]
+(defmethod eliminate Or [assumptions last-step conclusion]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)
         arg2 (:arg2 statement-to-eliminate)]
@@ -38,7 +33,7 @@
                        (->Assumption arg2 (generate-proof (list arg2) conclusion))
                        conclusion))))
 
-(defn eliminate-equ [assumptions last-step conclusion]
+(defmethod eliminate Equ [assumptions last-step conclusion]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)
         arg2 (:arg2 statement-to-eliminate)]
@@ -49,7 +44,7 @@
                                conclusion))
           [[arg1 arg2] [arg2 arg1]])))
 
-(defn eliminate-ent [assumptions last-step conclusion]
+(defmethod eliminate Ent [assumptions last-step conclusion]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)
         arg2 (:arg2 statement-to-eliminate)]
@@ -59,7 +54,7 @@
                         (generate-proof assumptions arg1)
                         conclusion))))
 
-(defn eliminate-not [assumptions last-step conclusion]
+(defmethod eliminate Not [assumptions last-step conclusion]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)]
     (if (and (Not? arg1)
@@ -109,11 +104,7 @@
         assumptions))
 
 (defn try-elimination [assumptions conclusion]
-  (some #(cond (And? %) (eliminate-and assumptions (->Reiteration %) conclusion)
-               (Or?  %) (eliminate-or  assumptions (->Reiteration %) conclusion)
-               (Equ? %) (eliminate-equ assumptions (->Reiteration %) conclusion)
-               (Ent? %) (eliminate-ent assumptions (->Reiteration %) conclusion)
-               (Not? %) (eliminate-not assumptions (->Reiteration %) conclusion))
+  (some #(eliminate assumptions (->Reiteration %) conclusion)
         (sort-by statement-priority assumptions)))
 
 (defn try-introduction [assumptions conclusion]
