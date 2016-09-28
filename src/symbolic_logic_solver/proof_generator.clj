@@ -10,6 +10,8 @@
 
 (defmulti eliminate (fn [assumptions step conclusion] (class (:conclusion step))))
 
+(defmethod eliminate Var [assumptions last-step conclusion] nil)
+
 (defmethod eliminate And [assumptions last-step conclusion]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)
