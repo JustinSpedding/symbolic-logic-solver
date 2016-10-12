@@ -65,12 +65,25 @@
                  conclusion
                  (conj already-eliminated arg2)))))
 
+(defmulti eliminate-not-multi (fn [assumptions last-step conclusion already-eliminated] (class (:arg1 (:conclusion last-step)))))
+
 (defmethod eliminate-multi Not [assumptions last-step conclusion already-eliminated]
+  (eliminate-not-multi assumptions last-step conclusion already-eliminated))
+
+(defmethod eliminate-not-multi Var [assumptions last-step conclusion already-eliminated] nil)
+
+(defmethod eliminate-not-multi And [assumptions last-step conclusion already-eliminated])
+
+(defmethod eliminate-not-multi Or [assumptions last-step conclusion already-eliminated])
+
+(defmethod eliminate-not-multi Equ [assumptions last-step conclusion already-eliminated])
+
+(defmethod eliminate-not-multi Ent [assumptions last-step conclusion already-eliminated])
+
+(defmethod eliminate-not-multi Not [assumptions last-step conclusion already-eliminated]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)]
-    (if (and (Not? arg1)
-             (not (already-eliminated (:arg1 arg1)))
-             (entails? (list (:arg1 arg1)) conclusion))
+    (if (and (not (already-eliminated (:arg1 arg1))))
       (eliminate assumptions
                  (->NotElimination last-step
                                    (:arg1 arg1))
