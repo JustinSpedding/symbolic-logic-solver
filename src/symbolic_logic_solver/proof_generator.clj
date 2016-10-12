@@ -8,23 +8,25 @@
 
 (declare generate-proof)
 
-(defmulti eliminate (fn [assumptions step conclusion] (class (:conclusion step))))
+(defmulti eliminate-multi (fn [assumptions last-step conclusion already-eliminated] (class (:conclusion last-step))))
 
-(defmethod eliminate Var [assumptions last-step conclusion] nil)
+(defn eliminate [assumptions last-step conclusion already-eliminated]
+  (cond (= conclusion (:conclusion last-step)) last-step
+        (entails? (list) conclusion) nil
+        :else (eliminate-multi assumptions last-step conclusion already-eliminated)))
 
-(defmethod eliminate And [assumptions last-step conclusion]
+(defmethod eliminate-multi Var [assumptions last-step conclusion already-eliminated] nil)
+
+(defmethod eliminate-multi And [assumptions last-step conclusion already-eliminated]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)
         arg2 (:arg2 statement-to-eliminate)]
-    (some #(if (and (entails? (list %) conclusion)
-                    (not (entails? (list) conclusion)))
-             (if (= conclusion %)
-               (->AndElimination last-step %)
-               (eliminate assumptions (->AndElimination last-step %) conclusion)))
+    (some #(if (and (not (already-eliminated %)))
+             (eliminate assumptions (->AndElimination last-step %) conclusion (conj already-eliminated %)))
           [arg1 arg2])))
 
 ;; TODO make this smarter so that other assumptions can be used inside
-(defmethod eliminate Or [assumptions last-step conclusion]
+(defmethod eliminate-multi Or [assumptions last-step conclusion already-eliminated]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)
         arg2 (:arg2 statement-to-eliminate)]
@@ -35,34 +37,45 @@
                        (->Assumption arg2 (generate-proof (list arg2) conclusion))
                        conclusion))))
 
-(defmethod eliminate Equ [assumptions last-step conclusion]
+(defmethod eliminate-multi Equ [assumptions last-step conclusion already-eliminated]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)
         arg2 (:arg2 statement-to-eliminate)]
-    (some #(if (and (= (first %) conclusion)
+    (some #(if (and (not (already-eliminated (first %)))
+                    (entails? (list (first %)) conclusion)
                     (entails? assumptions (second %)))
-             (->EquElimination last-step
-                               (generate-proof (remove (fn [x] (= statement-to-eliminate x)) assumptions) (second %))
-                               conclusion))
+             (eliminate assumptions
+                        (->EquElimination last-step
+                                          (generate-proof (remove (fn [x] (= statement-to-eliminate x)) assumptions) (second %))
+                                          (first %))
+                        conclusion
+                        (conj already-eliminated (first %))))
           [[arg1 arg2] [arg2 arg1]])))
 
-(defmethod eliminate Ent [assumptions last-step conclusion]
+(defmethod eliminate-multi Ent [assumptions last-step conclusion already-eliminated]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)
         arg2 (:arg2 statement-to-eliminate)]
-    (if (and (= arg2 conclusion)
+    (if (and (not (already-eliminated arg2))
              (entails? assumptions arg1))
-      (->EntElimination last-step
-                        (generate-proof assumptions arg1)
-                        conclusion))))
+      (eliminate assumptions
+                 (->EntElimination last-step
+                                   (generate-proof assumptions arg1)
+                                   arg2)
+                 conclusion
+                 (conj already-eliminated arg2)))))
 
-(defmethod eliminate Not [assumptions last-step conclusion]
+(defmethod eliminate-multi Not [assumptions last-step conclusion already-eliminated]
   (let [statement-to-eliminate (:conclusion last-step)
         arg1 (:arg1 statement-to-eliminate)]
     (if (and (Not? arg1)
-             (= (:arg1 arg1) conclusion))
-      (->NotElimination last-step
-                        conclusion))))
+             (not (already-eliminated (:arg1 arg1)))
+             (entails? (list (:arg1 arg1)) conclusion))
+      (eliminate assumptions
+                 (->NotElimination last-step
+                                   (:arg1 arg1))
+                 conclusion
+                 (conj already-eliminated (:arg1 arg1))))))
 
 (defmulti introduce (fn [assumptions conclusion] (class conclusion)))
 
@@ -110,7 +123,7 @@
         assumptions))
 
 (defn try-elimination [assumptions conclusion]
-  (some #(eliminate assumptions (->Reiteration %) conclusion)
+  (some #(eliminate assumptions (->Reiteration %) conclusion (hash-set))
         (sort-by statement-priority assumptions)))
 
 (defn try-introduction [assumptions conclusion]
