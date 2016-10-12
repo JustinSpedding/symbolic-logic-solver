@@ -294,16 +294,18 @@
     (is (not (generator/indirect-proof (list (->Var \q))
                                        (->Var \p))))))
 
-(deftest try-introduction-test
+(deftest try-elimination-test
   (testing "prioritizes elimination of specific statements"
     (let [and-statement (->And (->Var \p) (->Var \p))
           or-statement  (->Or  (->Var \p) (->Var \p))]
       (is (= (->AndElimination (->Reiteration and-statement) (->Var \p))
              (generator/try-elimination (list and-statement
                                               or-statement)
-                                        (->Var \p))))
+                                        (->Var \p)
+                                        (hash-set))))
 
       (is (= (->AndElimination (->Reiteration and-statement) (->Var \p))
              (generator/try-elimination (list or-statement
                                               and-statement)
-                                        (->Var \p)))))))
+                                        (->Var \p)
+                                        (hash-set)))))))

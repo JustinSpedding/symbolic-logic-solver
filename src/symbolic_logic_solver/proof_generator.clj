@@ -46,7 +46,7 @@
                     (entails? assumptions (second %)))
              (eliminate assumptions
                         (->EquElimination last-step
-                                          (generate-proof (remove (fn [x] (= statement-to-eliminate x)) assumptions) (second %))
+                                          (generate-proof (remove (fn [x] (= statement-to-eliminate x)) assumptions) (second %) already-eliminated)
                                           (first %))
                         conclusion
                         (conj already-eliminated (first %))))
@@ -60,7 +60,7 @@
              (entails? assumptions arg1))
       (eliminate assumptions
                  (->EntElimination last-step
-                                   (generate-proof assumptions arg1)
+                                   (generate-proof assumptions arg1 already-eliminated)
                                    arg2)
                  conclusion
                  (conj already-eliminated arg2)))))
@@ -135,8 +135,8 @@
            (->Reiteration conclusion))
         assumptions))
 
-(defn try-elimination [assumptions conclusion]
-  (some #(eliminate assumptions (->Reiteration %) conclusion (hash-set))
+(defn try-elimination [assumptions conclusion already-eliminated]
+  (some #(eliminate assumptions (->Reiteration %) conclusion already-eliminated)
         (sort-by statement-priority assumptions)))
 
 (defn try-introduction [assumptions conclusion]
@@ -147,9 +147,12 @@
     (->NotElimination proof conclusion)))
 
 ;; TODO do not check entails? within this function
-(defn generate-proof [assumptions conclusion]
-  (if (entails? assumptions conclusion)
-    (or (try-reiteration assumptions conclusion)
-        (try-elimination assumptions conclusion)
-        (try-introduction assumptions conclusion)
-        (indirect-proof assumptions conclusion))))
+(defn generate-proof
+  ([assumptions conclusion]
+   (generate-proof assumptions conclusion (hash-set)))
+  ([assumptions conclusion already-eliminated]
+   (if (entails? assumptions conclusion)
+     (or (try-reiteration assumptions conclusion)
+         (try-elimination assumptions conclusion already-eliminated)
+         (try-introduction assumptions conclusion)
+         (indirect-proof assumptions conclusion)))))
