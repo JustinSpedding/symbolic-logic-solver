@@ -72,13 +72,13 @@
 
 (defmethod eliminate-not-multi Var [assumptions last-step conclusion already-eliminated] nil)
 
-(defmethod eliminate-not-multi And [assumptions last-step conclusion already-eliminated])
+(defmethod eliminate-not-multi And [assumptions last-step conclusion already-eliminated] (throw (UnsupportedOperationException.)))
 
-(defmethod eliminate-not-multi Or [assumptions last-step conclusion already-eliminated])
+(defmethod eliminate-not-multi Or [assumptions last-step conclusion already-eliminated] (throw (UnsupportedOperationException.)))
 
-(defmethod eliminate-not-multi Equ [assumptions last-step conclusion already-eliminated])
+(defmethod eliminate-not-multi Equ [assumptions last-step conclusion already-eliminated] (throw (UnsupportedOperationException.)))
 
-(defmethod eliminate-not-multi Ent [assumptions last-step conclusion already-eliminated])
+(defmethod eliminate-not-multi Ent [assumptions last-step conclusion already-eliminated] (throw (UnsupportedOperationException.)))
 
 (defmethod eliminate-not-multi Not [assumptions last-step conclusion already-eliminated]
   (let [statement-to-eliminate (:conclusion last-step)
