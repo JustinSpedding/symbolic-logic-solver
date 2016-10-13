@@ -149,8 +149,9 @@
   (introduce assumptions conclusion))
 
 (defn indirect-proof [assumptions conclusion]
-  (if-let [proof (introduce assumptions (->Not (->Not conclusion)))]
-    (->NotElimination proof conclusion)))
+  (if (not= Not (class conclusion)) ; If not introduction already failed earlier, do not try again
+    (if-let [proof (introduce assumptions (->Not (->Not conclusion)))]
+      (->NotElimination proof conclusion))))
 
 ;; TODO do not check entails? within this function
 (defn generate-proof
