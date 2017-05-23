@@ -10,12 +10,12 @@
   :plugins [[refactor-nrepl "1.1.0"]
             [cider/cider-nrepl "0.13.0"]]
   :profiles {:uberjar {:aot :all}}
-             :debug-repl {:resource-paths ["/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/lib/tools.jar"]
+             :debug-repl {:resource-paths ["/usr/lib/jvm/java-8-openjdk-amd64/lib/tools.jar"]
                           :repl-options {:nrepl-middleware [debug-middleware.core/debug-middleware]}
                           :plugins [[refactor-nrepl "1.1.0"]
                                     [cider/cider-nrepl "0.13.0"]
                                     [venantius/ultra "0.4.1"]]
                           :dependencies [[org.clojure/clojure "1.8.0"]
-                                         [debug-middleware "0.1.1-SNAPSHOT"]
+                                         [debug-middleware "0.5.1"]
                                          [compliment "0.2.7"]
                                          [org.clojure/tools.nrepl "0.2.12"]]})
